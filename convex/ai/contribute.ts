@@ -183,8 +183,10 @@ export const generateContribution = action({
       repositoryId: args.repositoryId,
     });
 
-    const docs = await loadRepoDocs(ctx, args.repositoryId);
-    const issues = await fetchBeginnerIssues(repo.owner, repo.name);
+    const [docs, issues] = await Promise.all([
+      loadRepoDocs(ctx, args.repositoryId),
+      fetchBeginnerIssues(repo.owner, repo.name),
+    ]);
     const allowedUrls = issues.map((issue) => issue.html_url);
     const previousUrl = previous?.issueUrl;
     const hasOtherIssue = issues.some(

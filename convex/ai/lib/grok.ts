@@ -1,5 +1,8 @@
+import { fetchWithTimeout } from "./http";
+
 const GROK_URL = "https://api.x.ai/v1/chat/completions";
 const GROK_MODEL = "grok-3-mini";
+const GROK_TIMEOUT_MS = 20_000;
 
 type GrokResponse = {
   choices?: Array<{
@@ -23,21 +26,31 @@ export async function grokJson(system: string, user: string): Promise<unknown | 
     return null;
   }
 
-  const response = await fetch(GROK_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: GROK_MODEL,
-      temperature: 0,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetchWithTimeout(
+      GROK_URL,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: GROK_MODEL,
+          temperature: 0,
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: user },
+          ],
+        }),
+      },
+      GROK_TIMEOUT_MS,
+    );
+  } catch (error) {
+    console.error("Grok timed out or failed", error);
+    return null;
+  }
 
   if (!response.ok) {
     const body = await response.text();

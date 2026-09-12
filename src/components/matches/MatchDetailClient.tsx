@@ -26,7 +26,6 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
   const sessionId = useSessionId();
   const typedId = repositoryId as Id<"repositories">;
   const generateContribution = useAction(api.ai.contribute.generateContribution);
-  const enrichRepo = useAction(api.ai.enrich.enrichRepo);
   const ensureSuggested = useMutation(api.contributions.ensureSuggested);
   const markCompleted = useMutation(api.contributions.markCompleted);
   const [working, setWorking] = useState(false);
@@ -63,26 +62,28 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
     let cancelled = false;
     setWaitingKind("first");
+    const settle = () => {
+      if (!cancelled) {
+        setPlanSettledFor(typedId);
+      }
+    };
+    // generateContribution already scrapes docs. A second enrichRepo doubles Firecrawl.
     void generateContribution({
       sessionId,
       repositoryId: typedId,
       kind: "first",
     })
       .catch(() => ensureSuggested({ sessionId, repositoryId: typedId }))
-      .finally(() => {
-        if (!cancelled) {
-          setPlanSettledFor(typedId);
-        }
-      });
-    void enrichRepo({ repositoryId: typedId }).catch(() => {
-      // Enrichment is optional until repoDocuments exists.
-    });
+      .finally(settle);
+    const timeout = window.setTimeout(() => {
+      void ensureSuggested({ sessionId, repositoryId: typedId }).finally(settle);
+    }, 22_000);
     return () => {
       cancelled = true;
+      window.clearTimeout(timeout);
     };
   }, [
     contribution,
-    enrichRepo,
     ensureSuggested,
     generateContribution,
     hasMatch,

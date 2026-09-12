@@ -1,5 +1,9 @@
+import { fetchWithTimeout } from "./http";
+
 const FIRECRAWL_URL = "https://api.firecrawl.dev/v1/scrape";
 const MAX_MARKDOWN = 40_000;
+const SCRAPE_TIMEOUT_MS = 8_000;
+const MAX_FALLBACK_URLS = 4;
 
 type FirecrawlResponse = {
   success?: boolean;
@@ -13,17 +17,27 @@ export async function scrapeMarkdown(url: string): Promise<string | null> {
     return null;
   }
 
-  const response = await fetch(FIRECRAWL_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      url,
-      formats: ["markdown"],
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetchWithTimeout(
+      FIRECRAWL_URL,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url,
+          formats: ["markdown"],
+        }),
+      },
+      SCRAPE_TIMEOUT_MS,
+    );
+  } catch (error) {
+    console.error("Firecrawl timed out or failed", url, error);
+    return null;
+  }
 
   if (!response.ok) {
     const body = await response.text();
@@ -99,34 +113,27 @@ export function extractContributingUrls(
 
 export function contributingFallbackUrls(githubUrl: string): string[] {
   const root = repoRootUrl(githubUrl);
-  const paths = [
-    "CONTRIBUTING.md",
-    "docs/CONTRIBUTING.md",
-    ".github/CONTRIBUTING.md",
-    "CONTRIBUTING.rst",
-    "docs/contributing.md",
+  return [
+    `${root}/blob/HEAD/CONTRIBUTING.md`,
+    `${root}/blob/HEAD/.github/CONTRIBUTING.md`,
+    `${root}/blob/HEAD/docs/CONTRIBUTING.md`,
+    `${root}/blob/main/CONTRIBUTING.md`,
   ];
-  const refs = ["HEAD", "main", "master"];
-  const urls: string[] = [];
-  for (const ref of refs) {
-    for (const path of paths) {
-      urls.push(`${root}/blob/${ref}/${path}`);
-    }
-  }
-  return urls;
 }
 
 export async function scrapeFirstMarkdown(urls: string[]): Promise<string | null> {
-  const tried = new Set<string>();
+  const unique: string[] = [];
   for (const url of urls) {
-    if (tried.has(url)) {
-      continue;
+    if (!unique.includes(url)) {
+      unique.push(url);
     }
-    tried.add(url);
-    const markdown = await scrapeMarkdown(url);
-    if (markdown) {
-      return markdown;
+    if (unique.length >= MAX_FALLBACK_URLS) {
+      break;
     }
   }
-  return null;
+  if (unique.length === 0) {
+    return null;
+  }
+  const results = await Promise.all(unique.map((url) => scrapeMarkdown(url)));
+  return results.find((markdown) => markdown) ?? null;
 }
