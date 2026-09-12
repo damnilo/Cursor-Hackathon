@@ -6,7 +6,7 @@ import { useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function MatchesPageClient() {
   if (!isConvexConfigured()) {
@@ -38,10 +38,35 @@ function MatchesList() {
   );
   const [ranked, setRanked] = useState<typeof matches>(undefined);
   const [refreshing, setRefreshing] = useState(false);
+  const matchKey = useMemo(
+    () => matches?.map((match) => match.repositoryId).join(",") ?? "",
+    [matches],
+  );
 
   useEffect(() => {
     void seed({});
   }, [seed]);
+
+  useEffect(() => {
+    if (!sessionId || matchKey.length === 0) {
+      return;
+    }
+    let cancelled = false;
+    void rankMatches({ sessionId, limit: 5 })
+      .then((next) => {
+        if (!cancelled) {
+          setRanked(next);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRanked(undefined);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [matchKey, rankMatches, sessionId]);
 
   const shown = ranked ?? matches;
   const completedIds = new Set(

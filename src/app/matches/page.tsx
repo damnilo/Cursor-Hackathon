@@ -12,9 +12,8 @@ export default function MatchesPage() {
       </p>
       <h1 className="mt-4 text-3xl font-bold text-white">Your matches</h1>
       <p className="mt-4 max-w-2xl leading-relaxed text-slate-400">
-        Explainable scores from language, stack, topics, and good first issues.
-        Open a card for the contribution plan, then mark it complete when you
-        finish.
+        Baseline scores first, then a ranked shortlist. Open a card for the
+        first-contribution plan and mark it complete when you finish.
       </p>
       <MatchesPageClient />
     </AppShell>
