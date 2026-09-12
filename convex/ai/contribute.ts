@@ -7,6 +7,11 @@ import { Infer, v } from "convex/values";
 import { contributionKindValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
 import { loadRepoDocs } from "./lib/docs";
+import {
+  fetchBeginnerIssues,
+  pickAllowedIssueUrl,
+  type GithubIssue,
+} from "./lib/githubIssues";
 import { Id } from "../_generated/dataModel";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -21,6 +26,71 @@ function asStringArray(value: unknown): string[] {
 }
 
 type Kind = Infer<typeof contributionKindValidator>;
+
+function isVagueStep(step: string): boolean {
+  return /find a good first issue/i.test(step.trim());
+}
+
+function concreteFallbackSteps(
+  repoFullName: string,
+  issue: GithubIssue | undefined,
+): string[] {
+  if (issue) {
+    return [
+      `Open ${issue.html_url} and read the title, labels, and description for issue #${issue.number}.`,
+      `Fork ${repoFullName} on GitHub, then run: git clone <your-fork-url> && cd ${repoFullName.split("/")[1]}`,
+      `Create a branch: git checkout -b fix/${issue.number}-first-contrib`,
+      `In the files named in issue #${issue.number}, make the smallest change that matches the acceptance criteria.`,
+      `Follow the test or lint command from CONTRIBUTING.md (or package.json scripts) before you commit.`,
+      `Commit with: git commit -m "Fix #${issue.number}: ${issue.title.slice(0, 60)}"`,
+      `Push the branch and open a pull request that links #${issue.number} in the body.`,
+      `Reply on ${issue.html_url} with the PR URL once CI is green.`,
+    ];
+  }
+  return [
+    `Open ${repoFullName} README.md and CONTRIBUTING.md (or the contributing section linked from the README).`,
+    `Fork ${repoFullName}, then run: git clone <your-fork-url> && cd ${repoFullName.split("/")[1]}`,
+    `Create a branch: git checkout -b docs/${repoFullName.split("/")[1]}-typo`,
+    `Pick a docs or comment typo in README.md or docs/ — do not invent a GitHub issue URL.`,
+    `Run the project's documented lint or markdown check if CONTRIBUTING.md lists one.`,
+    `Commit with: git commit -m "docs: fix typo in README.md"`,
+    `Push the branch and open a pull request that describes the file you changed.`,
+    `In the PR body, quote the CONTRIBUTING.md section you followed.`,
+  ];
+}
+
+function enforceSteps(
+  raw: string[],
+  repoFullName: string,
+  issue: GithubIssue | undefined,
+): string[] {
+  const cleaned = raw
+    .map((step) => step.trim())
+    .filter((step) => step.length > 0 && !isVagueStep(step));
+  const fallback = concreteFallbackSteps(repoFullName, issue);
+  const merged = [...cleaned];
+  for (const step of fallback) {
+    if (merged.length >= 6) {
+      break;
+    }
+    if (!merged.includes(step)) {
+      merged.push(step);
+    }
+  }
+  if (merged.length < 6) {
+    merged.push(...fallback.slice(merged.length, 6));
+  }
+  return merged.slice(0, 8);
+}
+
+function enforceSkills(raw: string[], profileSkills: string[]): string[] {
+  const cleaned = raw.map((skill) => skill.trim()).filter(Boolean);
+  if (cleaned.length > 0) {
+    return cleaned.slice(0, 8);
+  }
+  const fromProfile = profileSkills.map((skill) => skill.trim()).filter(Boolean);
+  return fromProfile.length > 0 ? fromProfile.slice(0, 8) : ["git", "GitHub"];
+}
 
 export const generateContribution = action({
   args: {
@@ -54,11 +124,28 @@ export const generateContribution = action({
     }
 
     const docs = await loadRepoDocs(ctx, args.repositoryId);
+    const issues = await fetchBeginnerIssues(repo.owner, repo.name);
+    const allowedUrls = issues.map((issue) => issue.html_url);
 
     const grokResult = await grokJson(
-      "You write a concrete first open-source contribution plan for a student. Return ONLY JSON with keys title, issueUrl, steps (array of 4-7 short steps), skills (array), timeEstimate (string like '2-4 hours'). issueUrl may be empty.",
+      [
+        "You write a concrete first open-source contribution plan for one student and one repo.",
+        "Return ONLY JSON with keys: title, issueUrl, steps, skills, timeEstimate.",
+        "issueUrl MUST be copied exactly from allowedIssueUrls, or \"\" if that array is empty. Never invent a URL.",
+        "steps MUST be 6 to 8 items. Each step MUST name a file path, a shell command, or an issue number.",
+        "Do not write a step whose only instruction is to find a good first issue.",
+        "skills MUST be a non-empty array. timeEstimate MUST be a string such as \"2-4 hours\".",
+      ].join(" "),
       JSON.stringify({
         kind,
+        allowedIssueUrls: allowedUrls,
+        issues: issues.map((issue) => ({
+          title: issue.title,
+          html_url: issue.html_url,
+          labels: issue.labels,
+          body: issue.body,
+          number: issue.number,
+        })),
         student: {
           languages: profile.languages,
           stack: profile.stack,
@@ -77,41 +164,38 @@ export const generateContribution = action({
       }),
     );
 
-    if (!isRecord(grokResult)) {
-      return contributionId;
-    }
-
+    const grok = isRecord(grokResult) ? grokResult : {};
+    const chosenUrl =
+      pickAllowedIssueUrl(
+        typeof grok.issueUrl === "string" ? grok.issueUrl.trim() : undefined,
+        issues,
+      ) ?? issues[0]?.html_url;
+    const chosenIssue = issues.find((issue) => issue.html_url === chosenUrl);
     const title =
-      typeof grokResult.title === "string" && grokResult.title.trim().length > 0
-        ? grokResult.title.trim()
-        : `First contribution in ${repo.fullName}`;
-    const steps = asStringArray(grokResult.steps).slice(0, 8);
-    const skills = asStringArray(grokResult.skills).slice(0, 8);
-    const issueUrl =
-      typeof grokResult.issueUrl === "string" &&
-      grokResult.issueUrl.startsWith("http")
-        ? grokResult.issueUrl
-        : undefined;
-    const timeEstimate =
-      typeof grokResult.timeEstimate === "string" &&
-      grokResult.timeEstimate.trim().length > 0
-        ? grokResult.timeEstimate.trim()
-        : "2-4 hours";
+      typeof grok.title === "string" && grok.title.trim().length > 0
+        ? grok.title.trim()
+        : chosenIssue
+          ? `Work on #${chosenIssue.number}: ${chosenIssue.title}`
+          : `First contribution in ${repo.fullName}`;
 
     await ctx.runMutation(internal.ai.store.applyContributionPlan, {
       contributionId,
       title,
-      issueUrl,
-      steps:
-        steps.length > 0
-          ? steps
-          : [
-              `Read ${repo.fullName} README`,
-              "Find a good first issue or docs typo",
-              "Fork, branch, and open a small PR",
-            ],
-      skills: skills.length > 0 ? skills : profile.languages,
-      timeEstimate,
+      issueUrl: chosenUrl,
+      steps: enforceSteps(
+        asStringArray(grok.steps),
+        repo.fullName,
+        chosenIssue ?? issues[0],
+      ),
+      skills: enforceSkills(asStringArray(grok.skills), [
+        ...profile.languages,
+        ...profile.stack,
+      ]),
+      timeEstimate:
+        typeof grok.timeEstimate === "string" &&
+        grok.timeEstimate.trim().length > 0
+          ? grok.timeEstimate.trim()
+          : "2-4 hours",
       kind,
     });
 
