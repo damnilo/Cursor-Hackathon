@@ -1,5 +1,31 @@
 import Link from "next/link";
 
+export function WhyMatch({ reasons }: { reasons: string[] }) {
+  const aiReason = reasons.find((reason) => reason.startsWith("AI: "));
+  const rest = reasons.filter((reason) => !reason.startsWith("AI: "));
+  const lead = aiReason ? aiReason.slice(4).trim() : null;
+
+  if (!lead && rest.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        Why this match
+      </p>
+      {lead ? <p className="mt-2 text-sm text-slate-300">{lead}</p> : null}
+      {rest.length > 0 ? (
+        <ul className="mt-2 space-y-1 text-sm text-slate-400">
+          {rest.map((reason) => (
+            <li key={reason}>• {reason}</li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 type MatchCardProps = {
   rank: number;
   repositoryId: string;
@@ -69,11 +95,7 @@ export function MatchCard({
           {stars.toLocaleString()} stars
         </span>
       </div>
-      <ul className="mt-4 space-y-1 text-sm text-slate-400">
-        {reasons.map((reason) => (
-          <li key={reason}>• {reason}</li>
-        ))}
-      </ul>
+      <WhyMatch reasons={reasons} />
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
           href={`/matches/${repositoryId}`}
