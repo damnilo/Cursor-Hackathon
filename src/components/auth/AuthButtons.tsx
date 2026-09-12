@@ -20,6 +20,7 @@ function AuthControls() {
   const sessionId = useSessionId();
   const linkSession = useMutation(api.profiles.linkSession);
   const [working, setWorking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !sessionId) {
@@ -41,6 +42,7 @@ function AuthControls() {
         disabled={working}
         onClick={() => {
           setWorking(true);
+          setError(null);
           void signOut().finally(() => setWorking(false));
         }}
         className="rounded-sm border border-slate-600 px-4 py-2 font-mono text-[12px] uppercase tracking-[0.12em] text-slate-200 transition hover:border-slate-400 disabled:opacity-60"
@@ -51,18 +53,38 @@ function AuthControls() {
   }
 
   return (
-    <button
-      type="button"
-      disabled={working}
-      onClick={() => {
-        setWorking(true);
-        void signIn("google", { redirectTo: window.location.href }).finally(
-          () => setWorking(false),
-        );
-      }}
+    <div className="flex flex-col items-end gap-1">
+      <button
+        type="button"
+        disabled={working}
+        onClick={() => {
+          setWorking(true);
+          setError(null);
+          void signIn("google", { redirectTo: window.location.href })
+            .catch((caught: unknown) => {
+              const message =
+                caught instanceof Error ? caught.message : "Sign-in failed";
+              setError(
+                message.includes("auth:signIn")
+                  ? "Auth is not on the Convex deployment. Run npx convex dev."
+                  : message.includes("AUTH_GOOGLE") ||
+                      message.includes("Client Id") ||
+                      message.includes("client_id")
+                    ? "Google OAuth keys are missing in the Convex dashboard."
+                    : message,
+              );
+            })
+            .finally(() => setWorking(false));
+        }}
         className="inline-flex h-10 items-center rounded-sm bg-sky-500 px-[18px] font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
-    >
-      {working ? "Opening Google…" : "Sign in with Google"}
-    </button>
+      >
+        {working ? "Opening Google…" : "Sign in with Google"}
+      </button>
+      {error ? (
+        <p className="max-w-[220px] text-right text-[11px] leading-snug text-rose-300">
+          {error}
+        </p>
+      ) : null}
+    </div>
   );
 }
