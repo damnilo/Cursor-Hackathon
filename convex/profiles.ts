@@ -5,8 +5,11 @@ import { studentProfileFields } from "./lib/validators";
 const profileDoc = v.object({
   _id: v.id("studentProfiles"),
   _creationTime: v.number(),
-  sessionId: v.string(),
-  updatedAt: v.number(),
+  sessionId: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  label: v.optional(v.string()),
+  isFixture: v.optional(v.boolean()),
+  updatedAt: v.optional(v.number()),
   ...studentProfileFields,
 });
 

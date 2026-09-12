@@ -8,6 +8,11 @@
  * @module
  */
 
+import type * as ai_contribute from "../ai/contribute.js";
+import type * as ai_enrich from "../ai/enrich.js";
+import type * as ai_normalize from "../ai/normalize.js";
+import type * as ai_rank from "../ai/rank.js";
+import type * as contributions from "../contributions.js";
 import type * as data_sampleProfiles from "../data/sampleProfiles.js";
 import type * as data_verifiedRepos from "../data/verifiedRepos.js";
 import type * as fixtures from "../fixtures.js";
@@ -27,6 +32,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "ai/contribute": typeof ai_contribute;
+  "ai/enrich": typeof ai_enrich;
+  "ai/normalize": typeof ai_normalize;
+  "ai/rank": typeof ai_rank;
+  contributions: typeof contributions;
   "data/sampleProfiles": typeof data_sampleProfiles;
   "data/verifiedRepos": typeof data_verifiedRepos;
   fixtures: typeof fixtures;

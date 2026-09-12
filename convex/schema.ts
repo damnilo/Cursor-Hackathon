@@ -1,3 +1,5 @@
+// OWNER: shared freeze for `repositories` and `studentProfiles`.
+// AI track may add optional fields or a new `repoDocuments` table — do not rename existing fields.
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import {
@@ -11,7 +13,6 @@ export default defineSchema({
     .index("by_fullName", ["fullName"])
     .index("by_difficulty", ["difficulty"])
     .index("by_primaryLanguage", ["primaryLanguage"])
-    .index("by_language", ["primaryLanguage"])
     .index("by_good_first", ["hasGoodFirstIssues"]),
 
   studentProfiles: defineTable({

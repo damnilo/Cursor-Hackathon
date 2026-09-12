@@ -1,3 +1,5 @@
+// Catalog / facets / sample profiles only.
+// UI must use `api.matching.matchRepos` — do not add AI ranking here.
 import { mutation, query } from "./_generated/server";
 import { Infer, v } from "convex/values";
 import schema from "./schema";
@@ -132,9 +134,11 @@ export const listSampleProfiles = query({
   handler: async (ctx) => {
     const stored = await ctx.db.query("studentProfiles").take(20);
     if (stored.length > 0) {
-      return stored.map((profile) => ({
-        slug: profile.slug,
-        label: profile.label,
+      return stored
+        .filter((profile) => profile.slug && profile.label)
+        .map((profile) => ({
+        slug: profile.slug ?? "",
+        label: profile.label ?? "",
         languages: profile.languages,
         stack: profile.stack,
         topics: profile.topics,

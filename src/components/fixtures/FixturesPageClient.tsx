@@ -44,6 +44,7 @@ function FixtureResults() {
               <MatchCard
                 key={`${fixture.name}-${match.repositoryId}`}
                 rank={index + 1}
+                repositoryId={match.repositoryId}
                 fullName={match.fullName}
                 url={match.url}
                 description={match.description}
