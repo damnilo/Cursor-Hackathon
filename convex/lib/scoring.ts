@@ -14,7 +14,9 @@ export type ScorableRepo = {
   topics: string[];
   difficulty: Difficulty;
   hasGoodFirstIssues: boolean;
+  hasContributingGuide: boolean;
   primaryLanguage: string;
+  stars: number;
 };
 
 const WEIGHTS = {
@@ -54,11 +56,35 @@ function listPhrase(items: string[]): string {
   return `${items.slice(0, -1).join(", ")}, and ${last ?? ""}`;
 }
 
-function ratio(hits: number, total: number): number {
-  if (total <= 0) {
+/** 1 hit is enough for most of the weight; extra hits finish it. Never divide by how many chips the student picked. */
+function overlapScore(hits: number, weight: number): number {
+  if (hits <= 0) {
     return 0;
   }
-  return hits / total;
+  return weight * (hits >= 2 ? 1 : 0.7);
+}
+
+function languageScore(profile: MatchProfile, repo: ScorableRepo, hits: string[]): number {
+  if (hits.length === 0) {
+    return 0;
+  }
+  const preferred = profile.languages[0];
+  const primary = repo.primaryLanguage;
+  const primaryIsPreferred =
+    Boolean(preferred) && normalize(primary) === normalize(preferred);
+  const primaryIsKnown = overlap(profile.languages, [primary]).length > 0;
+  if (primaryIsPreferred) {
+    return WEIGHTS.language;
+  }
+  if (primaryIsKnown) {
+    return Math.round(WEIGHTS.language * 0.85);
+  }
+  return Math.round(WEIGHTS.language * 0.65);
+}
+
+function starScore(stars: number): number {
+  // log10(100)≈2 → 4, log10(10k)≈4 → 8, log10(100k)≈5 → 10
+  return Math.min(10, Math.max(0, Math.round(Math.log10(Math.max(stars, 10)) * 2)));
 }
 
 export function passesHardFilters(
@@ -97,18 +123,25 @@ export function scoreRepository(
   const stackHits = overlap(profile.stack, repo.stack);
   const topicHits = overlap(profile.topics, repo.topics);
 
-  const languageScore = WEIGHTS.language * ratio(languageHits.length, profile.languages.length);
-  const stackScore = WEIGHTS.stack * ratio(stackHits.length, profile.stack.length);
-  const topicScore = WEIGHTS.topics * ratio(topicHits.length, profile.topics.length);
   const gfiScore =
     profile.wantGoodFirstIssue && repo.hasGoodFirstIssues
       ? WEIGHTS.goodFirstIssue
       : 0;
   const difficultyScore =
     profile.level === repo.difficulty ? WEIGHTS.difficulty : 0;
+  const guideScore = repo.hasContributingGuide ? 5 : 0;
 
-  const score = Math.round(
-    languageScore + stackScore + topicScore + gfiScore + difficultyScore,
+  const score = Math.min(
+    100,
+    Math.round(
+      languageScore(profile, repo, languageHits) +
+        overlapScore(stackHits.length, WEIGHTS.stack) +
+        overlapScore(topicHits.length, WEIGHTS.topics) +
+        gfiScore +
+        difficultyScore +
+        guideScore +
+        starScore(repo.stars),
+    ),
   );
 
   const reasons: string[] = [];
