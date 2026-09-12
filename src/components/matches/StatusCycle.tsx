@@ -9,11 +9,17 @@ const RANKING_MESSAGES = [
   "Picking the clearest first-contribution paths…",
 ];
 
-const PLAN_MESSAGES = [
+const FIRST_PLAN_MESSAGES = [
   "Generating your first-contribution plan…",
   "Reading the repo guide for newcomers…",
   "Looking up beginner-friendly issues…",
   "Asking Grok for a concrete first issue…",
+];
+
+const NEXT_PLAN_MESSAGES = [
+  "Finding your next contribution…",
+  "Looking up another beginner-friendly issue…",
+  "Asking Grok for a follow-up plan…",
 ];
 
 function useCycle(length: number, intervalMs: number) {
@@ -61,8 +67,9 @@ export function RankingWait() {
   );
 }
 
-export function PlanWait() {
-  const messageIndex = useCycle(PLAN_MESSAGES.length, 2600);
+export function PlanWait({ kind = "first" }: { kind?: "first" | "next" }) {
+  const messages = kind === "next" ? NEXT_PLAN_MESSAGES : FIRST_PLAN_MESSAGES;
+  const messageIndex = useCycle(messages.length, 2600);
   const [lines, setLines] = useState(2);
 
   useEffect(() => {
@@ -76,7 +83,7 @@ export function PlanWait() {
 
   return (
     <div className="mt-10 space-y-4">
-      <p className="text-sm text-slate-300">{PLAN_MESSAGES[messageIndex]}</p>
+      <p className="text-sm text-slate-300">{messages[messageIndex]}</p>
       <div className="animate-pulse rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <div className="h-5 w-1/2 rounded bg-slate-700" />
         <div className="mt-4 h-4 w-full rounded bg-slate-800" />

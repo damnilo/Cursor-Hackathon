@@ -36,8 +36,8 @@ function FixtureResults() {
         <section key={fixture.name}>
           <h2 className="text-xl font-semibold text-white">{fixture.name}</h2>
           <p className="mt-2 text-sm text-slate-400">
-            {fixture.candidateCount} repos passed filters · showing top{" "}
-            {fixture.matches.length}
+            {fixture.candidateCount} repos passed filters · scored top{" "}
+            {fixture.matches.length} (baseline, not Grok-ranked)
           </p>
           <div className="mt-4 space-y-4">
             {fixture.matches.map((match, index) => (

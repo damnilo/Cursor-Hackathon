@@ -7,15 +7,15 @@ const steps = [
   },
   {
     step: "02",
-    title: "Deterministic matching",
+    title: "Get ranked matches",
     description:
-      "We filter and score 40+ curated repos against your profile — transparent, repeatable rules.",
+      "We score 40+ curated beginner-friendly repos against your profile, then Grok picks the clearest 3–5.",
   },
   {
     step: "03",
-    title: "AI-guided first PR",
+    title: "Open a first-PR plan",
     description:
-      "Grok ranks your top matches and suggests a concrete first contribution path.",
+      "Each match comes with a concrete issue, steps, and a way to mark it complete — then ask for the next one.",
   },
 ];
 
@@ -27,8 +27,8 @@ export function SolutionSection() {
           How FirstContrib works
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-slate-400">
-          Three phases: match with the right project, then get guided to your
-          first pull request.
+          Profile, ranked matches, then a concrete first pull request — not a
+          wall of repositories.
         </p>
         <div className="mt-12 grid gap-8 sm:grid-cols-3">
           {steps.map((item) => (

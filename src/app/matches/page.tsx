@@ -12,8 +12,8 @@ export default function MatchesPage() {
       </p>
       <h1 className="mt-4 text-3xl font-bold text-white">Your matches</h1>
       <p className="mt-4 max-w-2xl leading-relaxed text-slate-400">
-        We wait for the ranked shortlist before showing cards. Open one for the
-        first-contribution plan and mark it complete when you finish.
+        A short ranked list for this profile. Open a card for the first-PR
+        plan, mark it complete when you finish, then ask for the next one.
       </p>
       <MatchesPageClient />
     </AppShell>
