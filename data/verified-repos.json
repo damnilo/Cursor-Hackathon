@@ -1,605 +1,1217 @@
 {
   "version": 1,
   "curatedAt": "2026-03-12",
-  "count": 45,
+  "count": 46,
   "repositories": [
     {
       "owner": "firstcontributions",
       "name": "first-contributions",
+      "fullName": "firstcontributions/first-contributions",
       "url": "https://github.com/firstcontributions/first-contributions",
-      "languages": ["Markdown"],
-      "topics": ["open-source", "beginner", "git"],
-      "stars": 48000,
-      "hasContributingGuide": true,
+      "description": "Hands-on tutorial repo for making your very first open source contribution.",
+      "primaryLanguage": "Markdown",
+      "languages": [
+        "Markdown"
+      ],
+      "topics": [
+        "open-source",
+        "beginner",
+        "git"
+      ],
+      "stack": [
+        "Markdown"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Hands-on tutorial repo for making your very first open source contribution."
+      "newcomerNote": "Hands-on tutorial repo for making your very first open source contribution.",
+      "stars": 48000,
+      "verified": true
     },
     {
       "owner": "public-apis",
       "name": "public-apis",
+      "fullName": "public-apis/public-apis",
       "url": "https://github.com/public-apis/public-apis",
-      "languages": ["Python"],
-      "topics": ["api", "documentation", "lists"],
-      "stars": 320000,
-      "hasContributingGuide": true,
+      "description": "Collective list of free APIs — great for documentation and list-entry contributions.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "api",
+        "documentation",
+        "lists"
+      ],
+      "stack": [
+        "Python"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Collective list of free APIs — great for documentation and list-entry contributions."
+      "newcomerNote": "Collective list of free APIs — great for documentation and list-entry contributions.",
+      "stars": 320000,
+      "verified": true
     },
     {
       "owner": "freeCodeCamp",
       "name": "freeCodeCamp",
+      "fullName": "freeCodeCamp/freeCodeCamp",
       "url": "https://github.com/freeCodeCamp/freeCodeCamp",
-      "languages": ["TypeScript", "JavaScript"],
-      "topics": ["education", "nonprofit", "curriculum"],
-      "stars": 400000,
-      "hasContributingGuide": true,
+      "description": "Open source codebase and curriculum with many beginner-friendly issues.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "JavaScript"
+      ],
+      "topics": [
+        "education",
+        "nonprofit",
+        "curriculum"
+      ],
+      "stack": [
+        "TypeScript",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "medium",
-      "description": "Open source codebase and curriculum with many beginner-friendly issues."
+      "newcomerNote": "Open source codebase and curriculum with many beginner-friendly issues.",
+      "stars": 400000,
+      "verified": true
     },
     {
       "owner": "exercism",
       "name": "website",
+      "fullName": "exercism/website",
       "url": "https://github.com/exercism/website",
-      "languages": ["Ruby", "JavaScript"],
-      "topics": ["education", "programming", "mentoring"],
-      "stars": 900,
-      "hasContributingGuide": true,
+      "description": "Platform for learning programming through practice and mentorship.",
+      "primaryLanguage": "Ruby",
+      "languages": [
+        "Ruby",
+        "JavaScript"
+      ],
+      "topics": [
+        "education",
+        "programming",
+        "mentoring"
+      ],
+      "stack": [
+        "Ruby",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "medium",
-      "description": "Platform for learning programming through practice and mentorship."
+      "newcomerNote": "Platform for learning programming through practice and mentorship.",
+      "stars": 900,
+      "verified": true
     },
     {
       "owner": "eslint",
       "name": "eslint",
+      "fullName": "eslint/eslint",
       "url": "https://github.com/eslint/eslint",
-      "languages": ["JavaScript"],
-      "topics": ["linting", "developer-tools", "javascript"],
-      "stars": 26000,
-      "hasContributingGuide": true,
+      "description": "Pluggable JavaScript linter with labeled good first issues.",
+      "primaryLanguage": "JavaScript",
+      "languages": [
+        "JavaScript"
+      ],
+      "topics": [
+        "linting",
+        "developer-tools",
+        "javascript"
+      ],
+      "stack": [
+        "ESLint",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Pluggable JavaScript linter with labeled good first issues."
+      "newcomerNote": "Pluggable JavaScript linter with labeled good first issues.",
+      "stars": 26000,
+      "verified": true
     },
     {
       "owner": "nodejs",
       "name": "nodejs.org",
+      "fullName": "nodejs/nodejs.org",
       "url": "https://github.com/nodejs/nodejs.org",
-      "languages": ["TypeScript", "JavaScript"],
-      "topics": ["nodejs", "documentation", "website"],
-      "stars": 6500,
-      "hasContributingGuide": true,
+      "description": "Node.js website — documentation and content fixes welcome newcomers.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "JavaScript"
+      ],
+      "topics": [
+        "nodejs",
+        "documentation",
+        "website"
+      ],
+      "stack": [
+        "Node.js",
+        "TypeScript",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Node.js website — documentation and content fixes welcome newcomers."
+      "newcomerNote": "Node.js website — documentation and content fixes welcome newcomers.",
+      "stars": 6500,
+      "verified": true
     },
     {
       "owner": "mdn",
       "name": "content",
+      "fullName": "mdn/content",
       "url": "https://github.com/mdn/content",
-      "languages": ["Markdown"],
-      "topics": ["documentation", "web", "mozilla"],
-      "stars": 9500,
-      "hasContributingGuide": true,
+      "description": "MDN Web Docs content — ideal for students improving web documentation.",
+      "primaryLanguage": "Markdown",
+      "languages": [
+        "Markdown"
+      ],
+      "topics": [
+        "documentation",
+        "web",
+        "mozilla"
+      ],
+      "stack": [
+        "Markdown"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "MDN Web Docs content — ideal for students improving web documentation."
+      "newcomerNote": "MDN Web Docs content — ideal for students improving web documentation.",
+      "stars": 9500,
+      "verified": true
     },
     {
       "owner": "hoppscotch",
       "name": "hoppscotch",
+      "fullName": "hoppscotch/hoppscotch",
       "url": "https://github.com/hoppscotch/hoppscotch",
-      "languages": ["TypeScript", "Vue"],
-      "topics": ["api", "developer-tools", "open-source"],
-      "stars": 65000,
-      "hasContributingGuide": true,
+      "description": "Open source API development ecosystem with active contributor community.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "Vue"
+      ],
+      "topics": [
+        "api",
+        "developer-tools",
+        "open-source"
+      ],
+      "stack": [
+        "Vue",
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Open source API development ecosystem with active contributor community."
+      "newcomerNote": "Open source API development ecosystem with active contributor community.",
+      "stars": 65000,
+      "verified": true
     },
     {
       "owner": "appwrite",
       "name": "appwrite",
+      "fullName": "appwrite/appwrite",
       "url": "https://github.com/appwrite/appwrite",
-      "languages": ["TypeScript", "PHP"],
-      "topics": ["backend", "baas", "open-source"],
-      "stars": 46000,
-      "hasContributingGuide": true,
+      "description": "Backend-as-a-service platform that labels beginner-friendly issues.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "PHP"
+      ],
+      "topics": [
+        "backend",
+        "baas",
+        "open-source"
+      ],
+      "stack": [
+        "TypeScript",
+        "PHP"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Backend-as-a-service platform that labels beginner-friendly issues."
+      "newcomerNote": "Backend-as-a-service platform that labels beginner-friendly issues.",
+      "stars": 46000,
+      "verified": true
     },
     {
       "owner": "n8n-io",
       "name": "n8n",
+      "fullName": "n8n-io/n8n",
       "url": "https://github.com/n8n-io/n8n",
-      "languages": ["TypeScript"],
-      "topics": ["automation", "workflow", "integrations"],
-      "stars": 58000,
-      "hasContributingGuide": true,
+      "description": "Workflow automation tool with documentation and node contributions.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "automation",
+        "workflow",
+        "integrations"
+      ],
+      "stack": [
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Workflow automation tool with documentation and node contributions."
+      "newcomerNote": "Workflow automation tool with documentation and node contributions.",
+      "stars": 58000,
+      "verified": true
     },
     {
       "owner": "calcom",
       "name": "cal.com",
+      "fullName": "calcom/cal.com",
       "url": "https://github.com/calcom/cal.com",
-      "languages": ["TypeScript"],
-      "topics": ["scheduling", "saas", "open-source"],
-      "stars": 32000,
-      "hasContributingGuide": true,
+      "description": "Open source scheduling infrastructure welcoming new contributors.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "scheduling",
+        "saas",
+        "open-source"
+      ],
+      "stack": [
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Open source scheduling infrastructure welcoming new contributors."
+      "newcomerNote": "Open source scheduling infrastructure welcoming new contributors.",
+      "stars": 32000,
+      "verified": true
     },
     {
       "owner": "mattermost",
       "name": "mattermost",
+      "fullName": "mattermost/mattermost",
       "url": "https://github.com/mattermost/mattermost",
-      "languages": ["Go", "TypeScript"],
-      "topics": ["chat", "collaboration", "self-hosted"],
-      "stars": 30000,
-      "hasContributingGuide": true,
+      "description": "Open source team messaging with structured contributor onboarding.",
+      "primaryLanguage": "Go",
+      "languages": [
+        "Go",
+        "TypeScript"
+      ],
+      "topics": [
+        "chat",
+        "collaboration",
+        "self-hosted"
+      ],
+      "stack": [
+        "Go",
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Open source team messaging with structured contributor onboarding."
+      "newcomerNote": "Open source team messaging with structured contributor onboarding.",
+      "stars": 30000,
+      "verified": true
     },
     {
       "owner": "kubernetes",
       "name": "community",
+      "fullName": "kubernetes/community",
       "url": "https://github.com/kubernetes/community",
-      "languages": ["Markdown"],
-      "topics": ["kubernetes", "documentation", "community"],
-      "stars": 12000,
-      "hasContributingGuide": true,
+      "description": "Kubernetes community docs — non-code contributions for beginners.",
+      "primaryLanguage": "Markdown",
+      "languages": [
+        "Markdown"
+      ],
+      "topics": [
+        "kubernetes",
+        "documentation",
+        "community"
+      ],
+      "stack": [
+        "Kubernetes",
+        "Markdown"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Kubernetes community docs — non-code contributions for beginners."
+      "newcomerNote": "Kubernetes community docs — non-code contributions for beginners.",
+      "stars": 12000,
+      "verified": true
     },
     {
       "owner": "twbs",
       "name": "bootstrap",
+      "fullName": "twbs/bootstrap",
       "url": "https://github.com/twbs/bootstrap",
-      "languages": ["JavaScript", "SCSS"],
-      "topics": ["css", "framework", "frontend"],
-      "stars": 170000,
-      "hasContributingGuide": true,
+      "description": "Popular CSS framework with docs and component contributions.",
+      "primaryLanguage": "JavaScript",
+      "languages": [
+        "JavaScript",
+        "SCSS"
+      ],
+      "topics": [
+        "css",
+        "framework",
+        "frontend"
+      ],
+      "stack": [
+        "Bootstrap",
+        "JavaScript",
+        "SCSS"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Popular CSS framework with docs and component contributions."
+      "newcomerNote": "Popular CSS framework with docs and component contributions.",
+      "stars": 170000,
+      "verified": true
     },
     {
       "owner": "rust-lang",
       "name": "rust-clippy",
+      "fullName": "rust-lang/rust-clippy",
       "url": "https://github.com/rust-lang/rust-clippy",
-      "languages": ["Rust"],
-      "topics": ["rust", "linting", "developer-tools"],
-      "stars": 11000,
-      "hasContributingGuide": true,
+      "description": "Rust linter with many small, well-scoped good first issues.",
+      "primaryLanguage": "Rust",
+      "languages": [
+        "Rust"
+      ],
+      "topics": [
+        "rust",
+        "linting",
+        "developer-tools"
+      ],
+      "stack": [
+        "Rust"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Rust linter with many small, well-scoped good first issues."
+      "newcomerNote": "Rust linter with many small, well-scoped good first issues.",
+      "stars": 11000,
+      "verified": true
     },
     {
       "owner": "rust-lang",
       "name": "rustlings",
+      "fullName": "rust-lang/rustlings",
       "url": "https://github.com/rust-lang/rustlings",
-      "languages": ["Rust"],
-      "topics": ["rust", "education", "exercises"],
-      "stars": 55000,
-      "hasContributingGuide": true,
+      "description": "Small Rust exercises project — friendly for first Rust contributions.",
+      "primaryLanguage": "Rust",
+      "languages": [
+        "Rust"
+      ],
+      "topics": [
+        "rust",
+        "education",
+        "exercises"
+      ],
+      "stack": [
+        "Rust"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Small Rust exercises project — friendly for first Rust contributions."
+      "newcomerNote": "Small Rust exercises project — friendly for first Rust contributions.",
+      "stars": 55000,
+      "verified": true
     },
     {
       "owner": "django",
       "name": "django",
+      "fullName": "django/django",
       "url": "https://github.com/django/django",
-      "languages": ["Python"],
-      "topics": ["python", "web-framework", "orm"],
-      "stars": 80000,
-      "hasContributingGuide": true,
+      "description": "High-level Python web framework with triaged easy pickings.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "python",
+        "web-framework",
+        "orm"
+      ],
+      "stack": [
+        "Django",
+        "Python"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "High-level Python web framework with triaged easy pickings."
+      "newcomerNote": "High-level Python web framework with triaged easy pickings.",
+      "stars": 80000,
+      "verified": true
     },
     {
       "owner": "pandas-dev",
       "name": "pandas",
+      "fullName": "pandas-dev/pandas",
       "url": "https://github.com/pandas-dev/pandas",
-      "languages": ["Python"],
-      "topics": ["data-science", "analytics", "python"],
-      "stars": 43000,
-      "hasContributingGuide": true,
+      "description": "Data analysis library with documentation and test contributions.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "data-science",
+        "analytics",
+        "python"
+      ],
+      "stack": [
+        "Pandas",
+        "Python"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Data analysis library with documentation and test contributions."
+      "newcomerNote": "Data analysis library with documentation and test contributions.",
+      "stars": 43000,
+      "verified": true
     },
     {
       "owner": "scikit-learn",
       "name": "scikit-learn",
+      "fullName": "scikit-learn/scikit-learn",
       "url": "https://github.com/scikit-learn/scikit-learn",
-      "languages": ["Python"],
-      "topics": ["machine-learning", "data-science", "python"],
-      "stars": 60000,
-      "hasContributingGuide": true,
+      "description": "ML library with beginner-friendly docs and example fixes.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "machine-learning",
+        "data-science",
+        "python"
+      ],
+      "stack": [
+        "scikit-learn",
+        "Python"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "ML library with beginner-friendly docs and example fixes."
+      "newcomerNote": "ML library with beginner-friendly docs and example fixes.",
+      "stars": 60000,
+      "verified": true
     },
     {
       "owner": "Homebrew",
       "name": "brew",
+      "fullName": "Homebrew/brew",
       "url": "https://github.com/Homebrew/brew",
-      "languages": ["Ruby"],
-      "topics": ["package-manager", "macos", "linux"],
-      "stars": 41000,
-      "hasContributingGuide": true,
+      "description": "Package manager for macOS/Linux with structured contribution docs.",
+      "primaryLanguage": "Ruby",
+      "languages": [
+        "Ruby"
+      ],
+      "topics": [
+        "package-manager",
+        "macos",
+        "linux"
+      ],
+      "stack": [
+        "Homebrew",
+        "Ruby"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Package manager for macOS/Linux with structured contribution docs."
+      "newcomerNote": "Package manager for macOS/Linux with structured contribution docs.",
+      "stars": 41000,
+      "verified": true
     },
     {
       "owner": "ohmyzsh",
       "name": "ohmyzsh",
+      "fullName": "ohmyzsh/ohmyzsh",
       "url": "https://github.com/ohmyzsh/ohmyzsh",
-      "languages": ["Shell"],
-      "topics": ["zsh", "cli", "productivity"],
-      "stars": 170000,
-      "hasContributingGuide": true,
+      "description": "Community-driven Zsh framework — plugin and doc contributions.",
+      "primaryLanguage": "Shell",
+      "languages": [
+        "Shell"
+      ],
+      "topics": [
+        "zsh",
+        "cli",
+        "productivity"
+      ],
+      "stack": [
+        "Shell"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Community-driven Zsh framework — plugin and doc contributions."
+      "newcomerNote": "Community-driven Zsh framework — plugin and doc contributions.",
+      "stars": 170000,
+      "verified": true
     },
     {
       "owner": "prettier",
       "name": "prettier",
+      "fullName": "prettier/prettier",
       "url": "https://github.com/prettier/prettier",
-      "languages": ["JavaScript"],
-      "topics": ["formatter", "developer-tools", "javascript"],
-      "stars": 50000,
-      "hasContributingGuide": true,
+      "description": "Opinionated code formatter with well-defined good first issues.",
+      "primaryLanguage": "JavaScript",
+      "languages": [
+        "JavaScript"
+      ],
+      "topics": [
+        "formatter",
+        "developer-tools",
+        "javascript"
+      ],
+      "stack": [
+        "Prettier",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Opinionated code formatter with well-defined good first issues."
+      "newcomerNote": "Opinionated code formatter with well-defined good first issues.",
+      "stars": 50000,
+      "verified": true
     },
     {
       "owner": "webpack",
       "name": "webpack",
+      "fullName": "webpack/webpack",
       "url": "https://github.com/webpack/webpack",
-      "languages": ["JavaScript"],
-      "topics": ["bundler", "javascript", "build-tools"],
-      "stars": 65000,
-      "hasContributingGuide": true,
+      "description": "Module bundler with documentation and bugfix entry points.",
+      "primaryLanguage": "JavaScript",
+      "languages": [
+        "JavaScript"
+      ],
+      "topics": [
+        "bundler",
+        "javascript",
+        "build-tools"
+      ],
+      "stack": [
+        "Webpack",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Module bundler with documentation and bugfix entry points."
+      "newcomerNote": "Module bundler with documentation and bugfix entry points.",
+      "stars": 65000,
+      "verified": true
     },
     {
       "owner": "axios",
       "name": "axios",
+      "fullName": "axios/axios",
       "url": "https://github.com/axios/axios",
-      "languages": ["JavaScript"],
-      "topics": ["http", "api", "javascript"],
-      "stars": 106000,
-      "hasContributingGuide": true,
+      "description": "Promise-based HTTP client — smaller codebase, approachable issues.",
+      "primaryLanguage": "JavaScript",
+      "languages": [
+        "JavaScript"
+      ],
+      "topics": [
+        "http",
+        "api",
+        "javascript"
+      ],
+      "stack": [
+        "Axios",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "medium",
-      "description": "Promise-based HTTP client — smaller codebase, approachable issues."
+      "newcomerNote": "Promise-based HTTP client — smaller codebase, approachable issues.",
+      "stars": 106000,
+      "verified": true
     },
     {
       "owner": "lodash",
       "name": "lodash",
+      "fullName": "lodash/lodash",
       "url": "https://github.com/lodash/lodash",
-      "languages": ["JavaScript"],
-      "topics": ["utility", "javascript", "library"],
-      "stars": 60000,
-      "hasContributingGuide": true,
+      "description": "Modern JavaScript utility library with test and doc contributions.",
+      "primaryLanguage": "JavaScript",
+      "languages": [
+        "JavaScript"
+      ],
+      "topics": [
+        "utility",
+        "javascript",
+        "library"
+      ],
+      "stack": [
+        "Lodash",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Modern JavaScript utility library with test and doc contributions."
+      "newcomerNote": "Modern JavaScript utility library with test and doc contributions.",
+      "stars": 60000,
+      "verified": true
     },
     {
       "owner": "golang",
       "name": "go",
+      "fullName": "golang/go",
       "url": "https://github.com/golang/go",
-      "languages": ["Go"],
-      "topics": ["language", "compiler", "runtime"],
-      "stars": 127000,
-      "hasContributingGuide": true,
+      "description": "Go programming language — documentation and starter issues available.",
+      "primaryLanguage": "Go",
+      "languages": [
+        "Go"
+      ],
+      "topics": [
+        "language",
+        "compiler",
+        "runtime"
+      ],
+      "stack": [
+        "Go"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Go programming language — documentation and starter issues available."
+      "newcomerNote": "Go programming language — documentation and starter issues available.",
+      "stars": 127000,
+      "verified": true
     },
     {
       "owner": "gohugoio",
       "name": "hugo",
+      "fullName": "gohugoio/hugo",
       "url": "https://github.com/gohugoio/hugo",
-      "languages": ["Go"],
-      "topics": ["static-site", "generator", "go"],
-      "stars": 78000,
-      "hasContributingGuide": true,
+      "description": "Fast static site generator written in Go.",
+      "primaryLanguage": "Go",
+      "languages": [
+        "Go"
+      ],
+      "topics": [
+        "static-site",
+        "generator",
+        "go"
+      ],
+      "stack": [
+        "Hugo",
+        "Go"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Fast static site generator written in Go."
+      "newcomerNote": "Fast static site generator written in Go.",
+      "stars": 78000,
+      "verified": true
     },
     {
       "owner": "prometheus",
       "name": "prometheus",
+      "fullName": "prometheus/prometheus",
       "url": "https://github.com/prometheus/prometheus",
-      "languages": ["Go"],
-      "topics": ["monitoring", "metrics", "devops"],
-      "stars": 56000,
-      "hasContributingGuide": true,
+      "description": "Monitoring system with docs and smaller scoped issues.",
+      "primaryLanguage": "Go",
+      "languages": [
+        "Go"
+      ],
+      "topics": [
+        "monitoring",
+        "metrics",
+        "devops"
+      ],
+      "stack": [
+        "Prometheus",
+        "Go"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Monitoring system with docs and smaller scoped issues."
+      "newcomerNote": "Monitoring system with docs and smaller scoped issues.",
+      "stars": 56000,
+      "verified": true
     },
     {
       "owner": "grafana",
       "name": "grafana",
+      "fullName": "grafana/grafana",
       "url": "https://github.com/grafana/grafana",
-      "languages": ["TypeScript", "Go"],
-      "topics": ["observability", "dashboards", "monitoring"],
-      "stars": 65000,
-      "hasContributingGuide": true,
+      "description": "Observability platform with help-wanted and good-first-issue labels.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "Go"
+      ],
+      "topics": [
+        "observability",
+        "dashboards",
+        "monitoring"
+      ],
+      "stack": [
+        "Grafana",
+        "TypeScript",
+        "Go"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Observability platform with help-wanted and good-first-issue labels."
+      "newcomerNote": "Observability platform with help-wanted and good-first-issue labels.",
+      "stars": 65000,
+      "verified": true
     },
     {
       "owner": "symfony",
       "name": "symfony-docs",
+      "fullName": "symfony/symfony-docs",
       "url": "https://github.com/symfony/symfony-docs",
-      "languages": ["RST"],
-      "topics": ["php", "documentation", "symfony"],
-      "stars": 2100,
-      "hasContributingGuide": true,
+      "description": "Symfony documentation — excellent for first doc contributions in PHP ecosystem.",
+      "primaryLanguage": "RST",
+      "languages": [
+        "RST"
+      ],
+      "topics": [
+        "php",
+        "documentation",
+        "symfony"
+      ],
+      "stack": [
+        "Symfony",
+        "RST"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Symfony documentation — excellent for first doc contributions in PHP ecosystem."
+      "newcomerNote": "Symfony documentation — excellent for first doc contributions in PHP ecosystem.",
+      "stars": 2100,
+      "verified": true
     },
     {
       "owner": "laravel",
       "name": "docs",
+      "fullName": "laravel/docs",
       "url": "https://github.com/laravel/docs",
-      "languages": ["Markdown"],
-      "topics": ["php", "laravel", "documentation"],
-      "stars": 3100,
-      "hasContributingGuide": true,
+      "description": "Laravel documentation repository for typo fixes and examples.",
+      "primaryLanguage": "Markdown",
+      "languages": [
+        "Markdown"
+      ],
+      "topics": [
+        "php",
+        "laravel",
+        "documentation"
+      ],
+      "stack": [
+        "Laravel",
+        "Markdown"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Laravel documentation repository for typo fixes and examples."
+      "newcomerNote": "Laravel documentation repository for typo fixes and examples.",
+      "stars": 3100,
+      "verified": true
     },
     {
       "owner": "apache",
       "name": "superset",
+      "fullName": "apache/superset",
       "url": "https://github.com/apache/superset",
-      "languages": ["TypeScript", "Python"],
-      "topics": ["bi", "data-visualization", "analytics"],
-      "stars": 62000,
-      "hasContributingGuide": true,
+      "description": "Data exploration and visualization platform with contributor guides.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "Python"
+      ],
+      "topics": [
+        "bi",
+        "data-visualization",
+        "analytics"
+      ],
+      "stack": [
+        "TypeScript",
+        "Python"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Data exploration and visualization platform with contributor guides."
+      "newcomerNote": "Data exploration and visualization platform with contributor guides.",
+      "stars": 62000,
+      "verified": true
     },
     {
       "owner": "jupyter",
       "name": "notebook",
+      "fullName": "jupyter/notebook",
       "url": "https://github.com/jupyter/notebook",
-      "languages": ["Python", "JavaScript"],
-      "topics": ["jupyter", "notebooks", "education"],
-      "stars": 12000,
-      "hasContributingGuide": true,
+      "description": "Jupyter Notebook web application — Python and frontend contributions.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python",
+        "JavaScript"
+      ],
+      "topics": [
+        "jupyter",
+        "notebooks",
+        "education"
+      ],
+      "stack": [
+        "Jupyter",
+        "Python",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Jupyter Notebook web application — Python and frontend contributions."
+      "newcomerNote": "Jupyter Notebook web application — Python and frontend contributions.",
+      "stars": 12000,
+      "verified": true
     },
     {
       "owner": "numpy",
       "name": "numpy",
+      "fullName": "numpy/numpy",
       "url": "https://github.com/numpy/numpy",
-      "languages": ["Python", "C"],
-      "topics": ["scientific-computing", "python", "array"],
-      "stars": 28000,
-      "hasContributingGuide": true,
+      "description": "Fundamental Python package for scientific computing.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python",
+        "C"
+      ],
+      "topics": [
+        "scientific-computing",
+        "python",
+        "array"
+      ],
+      "stack": [
+        "NumPy",
+        "Python",
+        "C"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Fundamental Python package for scientific computing."
+      "newcomerNote": "Fundamental Python package for scientific computing.",
+      "stars": 28000,
+      "verified": true
     },
     {
       "owner": "opencv",
       "name": "opencv",
+      "fullName": "opencv/opencv",
       "url": "https://github.com/opencv/opencv",
-      "languages": ["C++", "Python"],
-      "topics": ["computer-vision", "image-processing", "ml"],
-      "stars": 78000,
-      "hasContributingGuide": true,
+      "description": "Open source computer vision library with docs and sample contributions.",
+      "primaryLanguage": "C++",
+      "languages": [
+        "C++",
+        "Python"
+      ],
+      "topics": [
+        "computer-vision",
+        "image-processing",
+        "ml"
+      ],
+      "stack": [
+        "OpenCV",
+        "C++",
+        "Python"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Open source computer vision library with docs and sample contributions."
+      "newcomerNote": "Open source computer vision library with docs and sample contributions.",
+      "stars": 78000,
+      "verified": true
     },
     {
       "owner": "electron",
       "name": "electron",
+      "fullName": "electron/electron",
       "url": "https://github.com/electron/electron",
-      "languages": ["TypeScript", "C++"],
-      "topics": ["desktop", "javascript", "cross-platform"],
-      "stars": 113000,
-      "hasContributingGuide": true,
+      "description": "Build cross-platform desktop apps with JavaScript, HTML, and CSS.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "C++"
+      ],
+      "topics": [
+        "desktop",
+        "javascript",
+        "cross-platform"
+      ],
+      "stack": [
+        "Electron",
+        "TypeScript",
+        "C++"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "Build cross-platform desktop apps with JavaScript, HTML, and CSS."
+      "newcomerNote": "Build cross-platform desktop apps with JavaScript, HTML, and CSS.",
+      "stars": 113000,
+      "verified": true
     },
     {
       "owner": "tailwindlabs",
       "name": "tailwindcss",
+      "fullName": "tailwindlabs/tailwindcss",
       "url": "https://github.com/tailwindlabs/tailwindcss",
-      "languages": ["TypeScript"],
-      "topics": ["css", "utility-first", "frontend"],
-      "stars": 82000,
-      "hasContributingGuide": true,
+      "description": "Utility-first CSS framework with docs and plugin contributions.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "css",
+        "utility-first",
+        "frontend"
+      ],
+      "stack": [
+        "Tailwind",
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Utility-first CSS framework with docs and plugin contributions."
+      "newcomerNote": "Utility-first CSS framework with docs and plugin contributions.",
+      "stars": 82000,
+      "verified": true
     },
     {
       "owner": "vitejs",
       "name": "vite",
+      "fullName": "vitejs/vite",
       "url": "https://github.com/vitejs/vite",
-      "languages": ["TypeScript"],
-      "topics": ["build-tool", "frontend", "dev-server"],
-      "stars": 70000,
-      "hasContributingGuide": true,
+      "description": "Next generation frontend tooling — active good-first-issue backlog.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "build-tool",
+        "frontend",
+        "dev-server"
+      ],
+      "stack": [
+        "Vite",
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Next generation frontend tooling — active good-first-issue backlog."
+      "newcomerNote": "Next generation frontend tooling — active good-first-issue backlog.",
+      "stars": 70000,
+      "verified": true
     },
     {
       "owner": "facebook",
       "name": "react",
+      "fullName": "facebook/react",
       "url": "https://github.com/facebook/react",
-      "languages": ["JavaScript"],
-      "topics": ["react", "ui", "frontend"],
-      "stars": 230000,
-      "hasContributingGuide": true,
+      "description": "React library — documentation and devtools contributions for learners.",
+      "primaryLanguage": "JavaScript",
+      "languages": [
+        "JavaScript"
+      ],
+      "topics": [
+        "react",
+        "ui",
+        "frontend"
+      ],
+      "stack": [
+        "React",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "React library — documentation and devtools contributions for learners."
+      "newcomerNote": "React library — documentation and devtools contributions for learners.",
+      "stars": 230000,
+      "verified": true
     },
     {
       "owner": "vercel",
       "name": "next.js",
+      "fullName": "vercel/next.js",
       "url": "https://github.com/vercel/next.js",
-      "languages": ["TypeScript", "JavaScript"],
-      "topics": ["react", "framework", "ssr"],
-      "stars": 130000,
-      "hasContributingGuide": true,
+      "description": "React framework for production with labeled starter issues.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript",
+        "JavaScript"
+      ],
+      "topics": [
+        "react",
+        "framework",
+        "ssr"
+      ],
+      "stack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "JavaScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "high",
-      "description": "React framework for production with labeled starter issues."
+      "newcomerNote": "React framework for production with labeled starter issues.",
+      "stars": 130000,
+      "verified": true
     },
     {
       "owner": "prisma",
       "name": "prisma",
+      "fullName": "prisma/prisma",
       "url": "https://github.com/prisma/prisma",
-      "languages": ["TypeScript"],
-      "topics": ["orm", "database", "typescript"],
-      "stars": 39000,
-      "hasContributingGuide": true,
+      "description": "Next-generation ORM with docs and example contributions.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "orm",
+        "database",
+        "typescript"
+      ],
+      "stack": [
+        "Prisma",
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "Next-generation ORM with docs and example contributions."
+      "newcomerNote": "Next-generation ORM with docs and example contributions.",
+      "stars": 39000,
+      "verified": true
     },
     {
       "owner": "trpc",
       "name": "trpc",
+      "fullName": "trpc/trpc",
       "url": "https://github.com/trpc/trpc",
-      "languages": ["TypeScript"],
-      "topics": ["api", "typescript", "fullstack"],
-      "stars": 35000,
-      "hasContributingGuide": true,
+      "description": "End-to-end typesafe APIs — approachable TypeScript codebase.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "api",
+        "typescript",
+        "fullstack"
+      ],
+      "stack": [
+        "tRPC",
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "End-to-end typesafe APIs — approachable TypeScript codebase."
+      "newcomerNote": "End-to-end typesafe APIs — approachable TypeScript codebase.",
+      "stars": 35000,
+      "verified": true
     },
     {
       "owner": "storybookjs",
       "name": "storybook",
+      "fullName": "storybookjs/storybook",
       "url": "https://github.com/storybookjs/storybook",
-      "languages": ["TypeScript"],
-      "topics": ["ui", "components", "testing"],
-      "stars": 85000,
-      "hasContributingGuide": true,
+      "description": "UI component workshop for isolated development and testing.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "ui",
+        "components",
+        "testing"
+      ],
+      "stack": [
+        "Storybook",
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "intermediate",
-      "timeCommitment": "medium",
-      "description": "UI component workshop for isolated development and testing."
+      "newcomerNote": "UI component workshop for isolated development and testing.",
+      "stars": 85000,
+      "verified": true
     },
     {
       "owner": "microsoft",
       "name": "TypeScript-Website",
+      "fullName": "microsoft/TypeScript-Website",
       "url": "https://github.com/microsoft/TypeScript-Website",
-      "languages": ["TypeScript"],
-      "topics": ["typescript", "documentation", "website"],
-      "stars": 2200,
-      "hasContributingGuide": true,
+      "description": "TypeScript documentation website — great doc and example contributions.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "TypeScript"
+      ],
+      "topics": [
+        "typescript",
+        "documentation",
+        "website"
+      ],
+      "stack": [
+        "TypeScript"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "TypeScript documentation website — great doc and example contributions."
+      "newcomerNote": "TypeScript documentation website — great doc and example contributions.",
+      "stars": 2200,
+      "verified": true
     },
     {
       "owner": "dotnet",
       "name": "docs",
+      "fullName": "dotnet/docs",
       "url": "https://github.com/dotnet/docs",
-      "languages": ["Markdown"],
-      "topics": ["dotnet", "csharp", "documentation"],
-      "stars": 4800,
-      "hasContributingGuide": true,
+      "description": ".NET documentation repo — beginner-friendly writing and code sample fixes.",
+      "primaryLanguage": "Markdown",
+      "languages": [
+        "Markdown"
+      ],
+      "topics": [
+        "dotnet",
+        "csharp",
+        "documentation"
+      ],
+      "stack": [
+        "Markdown"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": ".NET documentation repo — beginner-friendly writing and code sample fixes."
+      "newcomerNote": ".NET documentation repo — beginner-friendly writing and code sample fixes.",
+      "stars": 4800,
+      "verified": true
     },
     {
       "owner": "ansible",
       "name": "ansible-documentation",
+      "fullName": "ansible/ansible-documentation",
       "url": "https://github.com/ansible/ansible-documentation",
-      "languages": ["Python", "RST"],
-      "topics": ["devops", "automation", "documentation"],
-      "stars": 120,
-      "hasContributingGuide": true,
+      "description": "Ansible documentation — accessible DevOps doc contributions.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python",
+        "RST"
+      ],
+      "topics": [
+        "devops",
+        "automation",
+        "documentation"
+      ],
+      "stack": [
+        "Ansible",
+        "Python",
+        "RST"
+      ],
       "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
       "difficulty": "beginner",
-      "timeCommitment": "low",
-      "description": "Ansible documentation — accessible DevOps doc contributions."
+      "newcomerNote": "Ansible documentation — accessible DevOps doc contributions.",
+      "stars": 120,
+      "verified": true
     }
   ]
 }

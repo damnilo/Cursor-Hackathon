@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function CtaSection() {
   return (
     <section className="px-6 pb-24 pt-8 sm:px-10 lg:px-16">
@@ -6,11 +8,17 @@ export function CtaSection() {
           Ready to contribute?
         </h2>
         <p className="mt-4 text-slate-300">
-          Phase 2 brings student profiles and repository matching. Stay tuned —
-          your first open source win is closer than you think.
+          Fill a profile (no account) and we will score curated repos against
+          your languages, stack, and topics.
         </p>
+        <Link
+          href="/profile"
+          className="mt-8 inline-flex rounded-full bg-sky-500 px-8 py-3 text-sm font-semibold text-white transition hover:bg-sky-400"
+        >
+          Start with your profile
+        </Link>
         <p className="mt-8 text-sm text-slate-500">
-          Built for the hackathon · {45} verified beginner-friendly repositories
+          Built for the hackathon · 46 verified beginner-friendly repositories
           curated
         </p>
       </div>

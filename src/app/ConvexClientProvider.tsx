@@ -4,15 +4,16 @@ import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { ReactNode } from "react";
 
 const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-
-if (!convexUrl) {
-  throw new Error(
-    "Missing NEXT_PUBLIC_CONVEX_URL. Run `npx convex dev` to configure Convex.",
-  );
-}
-
-const convex = new ConvexReactClient(convexUrl);
+const convex = convexUrl ? new ConvexReactClient(convexUrl) : null;
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
+  if (!convex) {
+    return <>{children}</>;
+  }
+
   return <ConvexProvider client={convex}>{children}</ConvexProvider>;
+}
+
+export function isConvexConfigured(): boolean {
+  return Boolean(convexUrl);
 }

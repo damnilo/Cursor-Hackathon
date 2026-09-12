@@ -8,5 +8,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Must be set in the Render dashboard before the first build (Next inlines NEXT_PUBLIC_*).
       - key: NEXT_PUBLIC_CONVEX_URL
         sync: false
