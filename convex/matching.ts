@@ -4,6 +4,7 @@ import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { matchResultValidator, studentProfileFields } from "./lib/validators";
 import { passesHardFilters, scoreRepository } from "./lib/scoring";
+import { findProfile } from "./profiles";
 
 const DEFAULT_LIMIT = 5;
 const CANDIDATE_LIMIT = 15;
@@ -16,13 +17,14 @@ export const matchRepos = query({
   },
   returns: v.array(matchResultValidator),
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
     const profile = args.profile
       ? args.profile
       : args.sessionId
-        ? await ctx.db
-            .query("studentProfiles")
-            .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId!))
-            .unique()
+        ? await findProfile(ctx, {
+            sessionId: args.sessionId,
+            tokenIdentifier: identity?.tokenIdentifier,
+          })
         : null;
 
     if (!profile) {

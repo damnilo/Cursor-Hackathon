@@ -50,24 +50,23 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
     if (!sessionId || !hasMatch || contribution === undefined) {
       return;
     }
+    if (
+      contribution?.status === "completed" ||
+      (contribution?.steps && contribution.steps.length > 0)
+    ) {
+      return;
+    }
     if (autoStartedFor.current === typedId) {
       return;
     }
     autoStartedFor.current = typedId;
 
-    if (contribution?.status === "completed") {
-      setPlanSettledFor(typedId);
-      return;
-    }
-
     let cancelled = false;
-    setWaitingKind("first");
     const settle = () => {
       if (!cancelled) {
         setPlanSettledFor(typedId);
       }
     };
-    // generateContribution already scrapes docs. A second enrichRepo doubles Firecrawl.
     void generateContribution({
       sessionId,
       repositoryId: typedId,
@@ -137,7 +136,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
     }
   }
 
-  if (!sessionId || matches === undefined) {
+  if (!sessionId || matches === undefined || contribution === undefined) {
     return <p className="mt-8 text-slate-400">Loading match…</p>;
   }
 
@@ -161,9 +160,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
   const completed = contribution?.status === "completed";
   const hasPlan = Boolean(contribution?.steps && contribution.steps.length > 0);
-  // Always wait for this visit's Grok run. Cached steps from an earlier
-  // session are otherwise shown first, then swapped when the action finishes.
-  const waitingForPlan = planSettledFor !== typedId;
+  const waitingForPlan = planSettledFor !== typedId && !hasPlan;
 
   return (
     <div className="mt-10 max-w-3xl">

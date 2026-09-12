@@ -35,15 +35,29 @@ export const seedRepositories = mutation({
   returns: seedResult,
   handler: async (ctx) => {
     let inserted = 0;
-    let updated = 0;
+    const already = await ctx.db.query("repositories").take(80);
+    const existingNames = new Set(already.map((repo) => repo.fullName));
+    const missing = curated.repositories.filter(
+      (repo) => !existingNames.has(repo.fullName),
+    );
+    if (missing.length === 0) {
+      return {
+        inserted: 0,
+        updated: 0,
+        total: curated.repositories.length,
+      };
+    }
 
-    for (const repo of curated.repositories) {
+    for (const repo of missing) {
       const existing = await ctx.db
         .query("repositories")
         .withIndex("by_fullName", (q) => q.eq("fullName", repo.fullName))
         .unique();
+      if (existing) {
+        continue;
+      }
 
-      const fields = {
+      await ctx.db.insert("repositories", {
         owner: repo.owner,
         name: repo.name,
         fullName: repo.fullName,
@@ -59,20 +73,13 @@ export const seedRepositories = mutation({
         newcomerNote: repo.newcomerNote,
         stars: repo.stars,
         verified: true as const,
-      };
-
-      if (existing) {
-        await ctx.db.patch("repositories", existing._id, fields);
-        updated += 1;
-      } else {
-        await ctx.db.insert("repositories", fields);
-        inserted += 1;
-      }
+      });
+      inserted += 1;
     }
 
     return {
       inserted,
-      updated,
+      updated: 0,
       total: curated.repositories.length,
     };
   },

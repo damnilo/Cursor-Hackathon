@@ -6,7 +6,6 @@ import { api, internal } from "../_generated/api";
 import { Infer, v } from "convex/values";
 import { contributionKindValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
-import { loadRepoDocs } from "./lib/docs";
 import {
   fetchBeginnerIssues,
   pickIssueForKind,
@@ -168,25 +167,35 @@ export const generateContribution = action({
       return null;
     }
 
-    const profile = await ctx.runQuery(api.profiles.getBySession, {
-      sessionId: args.sessionId,
-    });
-    const repo = await ctx.runQuery(internal.ai.store.getRepository, {
-      repositoryId: args.repositoryId,
-    });
+    const [profile, repo, previous, docs] = await Promise.all([
+      ctx.runQuery(api.profiles.getBySession, {
+        sessionId: args.sessionId,
+      }),
+      ctx.runQuery(internal.ai.store.getRepository, {
+        repositoryId: args.repositoryId,
+      }),
+      ctx.runQuery(api.contributions.getForRepo, {
+        sessionId: args.sessionId,
+        repositoryId: args.repositoryId,
+      }),
+      ctx.runQuery(internal.ai.store.getRepoDocument, {
+        repositoryId: args.repositoryId,
+      }),
+    ]);
     if (!profile || !repo) {
       return contributionId;
     }
+    if (
+      kind === "first" &&
+      previous?.steps &&
+      previous.steps.length > 0
+    ) {
+      return contributionId;
+    }
 
-    const previous = await ctx.runQuery(api.contributions.getForRepo, {
-      sessionId: args.sessionId,
-      repositoryId: args.repositoryId,
-    });
-
-    const [docs, issues] = await Promise.all([
-      loadRepoDocs(ctx, args.repositoryId),
-      fetchBeginnerIssues(repo.owner, repo.name),
-    ]);
+    // Do not scrape Firecrawl/Exa on this path — that hunt is 8s per URL and
+    // blocked the plan. Cached README/CONTRIBUTING is enough; issues drive quality.
+    const issues = await fetchBeginnerIssues(repo.owner, repo.name);
     const allowedUrls = issues.map((issue) => issue.html_url);
     const previousUrl = previous?.issueUrl;
     const hasOtherIssue = issues.some(
