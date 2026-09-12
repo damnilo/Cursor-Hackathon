@@ -29,6 +29,11 @@ export function MatchCard({
   newcomerNote,
   completed = false,
 }: MatchCardProps) {
+  const extraNote =
+    newcomerNote.trim().toLowerCase() !== description.trim().toLowerCase()
+      ? newcomerNote
+      : null;
+
   return (
     <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 transition hover:border-slate-700">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -54,7 +59,9 @@ export function MatchCard({
           {score}/100
         </p>
       </div>
-      <p className="mt-4 text-sm text-slate-300">{newcomerNote}</p>
+      {extraNote ? (
+        <p className="mt-4 text-sm text-slate-300">{extraNote}</p>
+      ) : null}
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-400">
         <span className="rounded-full border border-slate-700 px-2 py-1">{primaryLanguage}</span>
         <span className="rounded-full border border-slate-700 px-2 py-1">{difficulty}</span>
