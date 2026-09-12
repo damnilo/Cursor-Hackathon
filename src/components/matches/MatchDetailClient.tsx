@@ -30,6 +30,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
   const markCompleted = useMutation(api.contributions.markCompleted);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [planSettledFor, setPlanSettledFor] = useState<string | null>(null);
 
   const matches = useQuery(
     api.matching.matchRepos,
@@ -47,16 +48,24 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
     if (!sessionId || !hasMatch) {
       return;
     }
+    let cancelled = false;
     void generateContribution({
       sessionId,
       repositoryId: typedId,
       kind: "first",
-    }).catch(() =>
-      ensureSuggested({ sessionId, repositoryId: typedId }),
-    );
+    })
+      .catch(() => ensureSuggested({ sessionId, repositoryId: typedId }))
+      .finally(() => {
+        if (!cancelled) {
+          setPlanSettledFor(typedId);
+        }
+      });
     void enrichRepo({ repositoryId: typedId }).catch(() => {
       // Enrichment is optional until repoDocuments exists.
     });
+    return () => {
+      cancelled = true;
+    };
   }, [
     enrichRepo,
     ensureSuggested,
@@ -98,6 +107,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
   const completed = contribution?.status === "completed";
   const hasPlan = Boolean(contribution?.steps && contribution.steps.length > 0);
+  const waitingForPlan = !hasPlan && planSettledFor !== typedId;
 
   return (
     <div className="mt-10 max-w-3xl">
@@ -111,25 +121,26 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         ))}
       </ul>
 
+      {waitingForPlan ? (
+        <PlanWait />
+      ) : hasPlan ? (
       <section className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <h2 className="text-lg font-semibold text-white">
-          {hasPlan ? contribution?.title : "First contribution"}
+          {contribution?.title}
         </h2>
-        {hasPlan && contribution?.whyThisIssue ? (
+        {contribution?.whyThisIssue ? (
           <p className="mt-3 text-sm leading-relaxed text-slate-300">
             {contribution.whyThisIssue}
           </p>
         ) : null}
-        {hasPlan && contribution?.steps ? (
+        {contribution?.steps ? (
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-slate-300">
             {contribution.steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
-        ) : (
-          <PlanWait />
-        )}
-        {hasPlan && contribution?.issueUrl ? (
+        ) : null}
+        {contribution?.issueUrl ? (
           <a
             href={contribution.issueUrl}
             target="_blank"
@@ -159,6 +170,20 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         </div>
         {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
       </section>
+      ) : (
+        <p className="mt-10 text-sm text-slate-400">
+          Could not generate a plan yet.{" "}
+          <a
+            href={match.url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sky-400 hover:text-sky-300"
+          >
+            Open the repository on GitHub
+          </a>
+          .
+        </p>
+      )}
     </div>
   );
 }

@@ -12,6 +12,7 @@ const RANKING_MESSAGES = [
 const PLAN_MESSAGES = [
   "Generating your first-contribution plan…",
   "Reading the repo guide for newcomers…",
+  "Looking up beginner-friendly issues…",
   "Asking Grok for a concrete first issue…",
 ];
 
@@ -62,8 +63,29 @@ export function RankingWait() {
 
 export function PlanWait() {
   const messageIndex = useCycle(PLAN_MESSAGES.length, 2600);
+  const [lines, setLines] = useState(2);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setLines((current) => Math.min(current + 1, 6));
+    }, 2600);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const widths = ["w-full", "w-5/6", "w-4/5", "w-2/3", "w-3/4", "w-1/2"];
 
   return (
-    <p className="mt-3 text-sm text-slate-400">{PLAN_MESSAGES[messageIndex]}</p>
+    <div className="mt-10 space-y-4">
+      <p className="text-sm text-slate-300">{PLAN_MESSAGES[messageIndex]}</p>
+      <div className="animate-pulse rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <div className="h-5 w-1/2 rounded bg-slate-700" />
+        <div className="mt-4 h-4 w-full rounded bg-slate-800" />
+        <div className="mt-6 space-y-3">
+          {widths.slice(0, lines).map((width) => (
+            <div key={width} className={`h-4 rounded bg-slate-800 ${width}`} />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
