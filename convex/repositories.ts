@@ -132,30 +132,24 @@ export const listSampleProfiles = query({
   args: {},
   returns: v.array(sampleProfileValidator),
   handler: async (ctx) => {
-    const stored = await ctx.db.query("studentProfiles").take(20);
-    if (stored.length > 0) {
-      return stored
-        .filter((profile) => profile.slug && profile.label)
-        .map((profile) => ({
-        slug: profile.slug ?? "",
-        label: profile.label ?? "",
-        languages: profile.languages,
-        stack: profile.stack,
-        topics: profile.topics,
-        level: profile.level,
-        wantGoodFirstIssue: profile.wantGoodFirstIssue,
-      }));
+    const stored: Infer<typeof sampleProfileValidator>[] = [];
+    for (const sample of SAMPLE_PROFILES) {
+      const row = await ctx.db
+        .query("studentProfiles")
+        .withIndex("by_slug", (q) => q.eq("slug", sample.slug))
+        .first();
+      stored.push({
+        slug: sample.slug,
+        label: row?.label ?? sample.label,
+        languages: row?.languages ?? sample.languages,
+        stack: row?.stack ?? sample.stack,
+        topics: row?.topics ?? sample.topics,
+        level: row?.level ?? sample.level,
+        wantGoodFirstIssue:
+          row?.wantGoodFirstIssue ?? sample.wantGoodFirstIssue,
+      });
     }
-
-    return SAMPLE_PROFILES.map((profile) => ({
-      slug: profile.slug,
-      label: profile.label,
-      languages: profile.languages,
-      stack: profile.stack,
-      topics: profile.topics,
-      level: profile.level,
-      wantGoodFirstIssue: profile.wantGoodFirstIssue,
-    }));
+    return stored;
   },
 });
 
