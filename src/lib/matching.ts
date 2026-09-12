@@ -27,6 +27,7 @@ export type VerifiedRepository = {
 };
 
 export type MatchResult = VerifiedRepository & {
+  repositoryId: string;
   score: number;
   reasons: string[];
 };

@@ -8,7 +8,13 @@
  * @module
  */
 
+import type * as fixtures from "../fixtures.js";
 import type * as health from "../health.js";
+import type * as lib_scoring from "../lib/scoring.js";
+import type * as lib_validators from "../lib/validators.js";
+import type * as matching from "../matching.js";
+import type * as profiles from "../profiles.js";
+import type * as seed from "../seed.js";
 
 import type {
   ApiFromModules,
@@ -17,7 +23,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  fixtures: typeof fixtures;
   health: typeof health;
+  "lib/scoring": typeof lib_scoring;
+  "lib/validators": typeof lib_validators;
+  matching: typeof matching;
+  profiles: typeof profiles;
+  seed: typeof seed;
 }>;
 
 /**
