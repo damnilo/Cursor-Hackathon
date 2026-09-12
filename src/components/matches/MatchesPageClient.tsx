@@ -102,22 +102,36 @@ function MatchesList() {
 
   if (!profile) {
     return (
-      <p className="mt-8 text-slate-400">
-        No profile yet.{" "}
-        <Link href="/profile" className="text-sky-400 hover:text-sky-300">
-          Start with your languages
+      <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <p className="text-slate-200">No profile on this browser yet.</p>
+        <p className="mt-2 text-sm text-slate-400">
+          Pick at least one language so we can score beginner-friendly repos.
+        </p>
+        <Link
+          href="/profile"
+          className="mt-4 inline-flex rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
+        >
+          Start with your profile
         </Link>
-        .
-      </p>
+      </div>
     );
   }
 
   if (matches.length === 0) {
     return (
-      <p className="mt-8 text-slate-400">
-        No repositories passed the filters. Loosen languages or turn off the
-        good-first-issue requirement.
-      </p>
+      <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <p className="text-slate-200">No repositories passed your filters.</p>
+        <p className="mt-2 text-sm text-slate-400">
+          Add another language, or turn off “only good first issues” on your
+          profile and try again.
+        </p>
+        <Link
+          href="/profile"
+          className="mt-4 inline-flex rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400"
+        >
+          Edit profile
+        </Link>
+      </div>
     );
   }
 
@@ -129,8 +143,7 @@ function MatchesList() {
     <div className="mt-10 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-400">
-          Showing {shown.length} matches for {profile.languages.join(", ")}.
-          {rankResult.items ? " Ranked for this session." : " Deterministic fallback."}
+          Top {shown.length} matches for {profile.languages.join(", ")}.
         </p>
         <button
           type="button"
