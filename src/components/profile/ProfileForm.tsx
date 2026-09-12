@@ -35,12 +35,13 @@ export function ProfileForm() {
   const saveCv = useMutation(api.profiles.saveCv);
   const normalizeProfile = useAction(api.ai.normalize.normalizeProfile);
   const parseCv = useAction(api.ai.parseCv.parseCv);
-  const [cvName, setCvName] = useState<string | null>(null);
+  const [uploadedCvName, setUploadedCvName] = useState<string | null>(null);
   const [cvWorking, setCvWorking] = useState(false);
   const saved = useQuery(
     api.profiles.getBySession,
     sessionId ? { sessionId } : "skip",
   );
+  const cvName = uploadedCvName ?? saved?.cvFileName ?? null;
 
   const profile =
     draft ??
@@ -59,12 +60,6 @@ export function ProfileForm() {
       // Seed is best-effort; matching page will retry.
     });
   }, [seed]);
-
-  useEffect(() => {
-    if (saved?.cvFileName) {
-      setCvName(saved.cvFileName);
-    }
-  }, [saved?.cvFileName]);
 
   async function onCvSelected(file: File | undefined) {
     if (!file || !sessionId) {
@@ -95,7 +90,7 @@ export function ProfileForm() {
         storageId: payload.storageId as Id<"_storage">,
         fileName: file.name,
       });
-      setCvName(file.name);
+      setUploadedCvName(file.name);
       const parsed = await parseCv({ sessionId });
       if (parsed && parsed.languages.length > 0) {
         setDraft({
@@ -105,6 +100,8 @@ export function ProfileForm() {
           level: parsed.level,
           wantGoodFirstIssue: parsed.wantGoodFirstIssue,
         });
+      } else if (parsed?.error) {
+        setError(parsed.error);
       } else {
         setError(
           "CV is saved. Chip fill from Grok is not ready yet — pick languages manually.",

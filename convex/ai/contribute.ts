@@ -155,6 +155,9 @@ export const generateContribution = action({
   returns: v.union(v.id("contributions"), v.null()),
   handler: async (ctx, args): Promise<Id<"contributions"> | null> => {
     const kind: Kind = args.kind ?? "first";
+    await ctx.runMutation(api.profiles.linkSession, {
+      sessionId: args.sessionId,
+    });
     const contributionId = await ctx.runMutation(
       api.contributions.ensureSuggested,
       {

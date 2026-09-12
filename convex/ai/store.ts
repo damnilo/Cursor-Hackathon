@@ -70,6 +70,12 @@ export const applyContributionPlan = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
+    const existing = await ctx.db.get("contributions", args.contributionId);
+    if (!existing) {
+      throw new Error("Contribution not found");
+    }
+    const keepCompleted =
+      existing.status === "completed" && args.kind !== "next";
     await ctx.db.patch("contributions", args.contributionId, {
       title: args.title,
       issueUrl: args.issueUrl,
@@ -78,7 +84,7 @@ export const applyContributionPlan = internalMutation({
       skills: args.skills,
       timeEstimate: args.timeEstimate,
       kind: args.kind,
-      status: "suggested",
+      status: keepCompleted ? "completed" : "suggested",
     });
     return null;
   },
