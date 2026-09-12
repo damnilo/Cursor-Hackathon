@@ -10,8 +10,13 @@
 
 import type * as ai_contribute from "../ai/contribute.js";
 import type * as ai_enrich from "../ai/enrich.js";
+import type * as ai_lib_catalog from "../ai/lib/catalog.js";
+import type * as ai_lib_docs from "../ai/lib/docs.js";
+import type * as ai_lib_firecrawl from "../ai/lib/firecrawl.js";
+import type * as ai_lib_grok from "../ai/lib/grok.js";
 import type * as ai_normalize from "../ai/normalize.js";
 import type * as ai_rank from "../ai/rank.js";
+import type * as ai_store from "../ai/store.js";
 import type * as contributions from "../contributions.js";
 import type * as data_sampleProfiles from "../data/sampleProfiles.js";
 import type * as data_verifiedRepos from "../data/verifiedRepos.js";
@@ -34,8 +39,13 @@ import type {
 declare const fullApi: ApiFromModules<{
   "ai/contribute": typeof ai_contribute;
   "ai/enrich": typeof ai_enrich;
+  "ai/lib/catalog": typeof ai_lib_catalog;
+  "ai/lib/docs": typeof ai_lib_docs;
+  "ai/lib/firecrawl": typeof ai_lib_firecrawl;
+  "ai/lib/grok": typeof ai_lib_grok;
   "ai/normalize": typeof ai_normalize;
   "ai/rank": typeof ai_rank;
+  "ai/store": typeof ai_store;
   contributions: typeof contributions;
   "data/sampleProfiles": typeof data_sampleProfiles;
   "data/verifiedRepos": typeof data_verifiedRepos;

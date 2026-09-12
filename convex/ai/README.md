@@ -1,11 +1,15 @@
 # AI track (colleague)
 
-Fill these action bodies with Grok / Firecrawl / Exa. Do not edit
-`convex/matching.ts` or scoring weights.
+Grok / Firecrawl live in this folder. Do not edit `convex/matching.ts` or scoring weights.
 
-- `normalize.normalizeProfile` — optional profile cleanup
-- `rank.rankMatches` — must start from `api.matching.matchRepos` (limit 15), return top 3–5
-- `enrich.enrichRepo` — README / CONTRIBUTING scrape
-- `contribute.generateContribution` — write `title` / `steps` / `issueUrl` on `contributions`
+## Actions
 
-Stubs currently pass through deterministic matching so the UI is not blocked.
+- `api.ai.normalize.normalizeProfile({ sessionId })` — Grok maps chips onto the UI catalog, then upserts the session profile. Falls back to the stored profile if Grok is down.
+- `api.ai.rank.rankMatches({ sessionId, limit? })` — **always** starts from `api.matching.matchRepos` with `limit: 15`, then Grok reorders to top 3–5. Falls back to deterministic order.
+- `api.ai.enrich.enrichRepo({ repositoryId })` — Firecrawl README + CONTRIBUTING, cached in `repoDocuments`.
+- `api.ai.contribute.generateContribution({ sessionId, repositoryId, kind? })` — ensure row via Lazar's mutation, then Grok fills `title` / `steps` / `issueUrl`.
+
+## Env (Convex dashboard)
+
+- `XAI_API_KEY`
+- `FIRECRAWL_API_KEY`

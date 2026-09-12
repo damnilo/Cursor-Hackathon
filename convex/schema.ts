@@ -46,4 +46,14 @@ export default defineSchema({
     .index("by_repo_and_kind", ["repositoryId", "kind"])
     .index("by_profile", ["profileId"])
     .index("by_profile_and_repo", ["profileId", "repositoryId"]),
+
+  // AI track cache for Firecrawl README / CONTRIBUTING. Do not rename other tables.
+  repoDocuments: defineTable({
+    repositoryId: v.id("repositories"),
+    readmeMarkdown: v.optional(v.string()),
+    contributingMarkdown: v.optional(v.string()),
+    source: v.union(v.literal("firecrawl"), v.literal("none")),
+    note: v.string(),
+    fetchedAt: v.number(),
+  }).index("by_repository", ["repositoryId"]),
 });
