@@ -9,7 +9,7 @@ import {
 import { useSessionId } from "@/lib/session";
 import type { Difficulty, StudentProfile } from "@/lib/matching";
 import { api } from "../../../convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
@@ -30,6 +30,7 @@ export function ProfileForm() {
 
   const seed = useMutation(api.seed.seedRepositories);
   const upsert = useMutation(api.profiles.upsert);
+  const normalizeProfile = useAction(api.ai.normalize.normalizeProfile);
   const saved = useQuery(
     api.profiles.getBySession,
     sessionId ? { sessionId } : "skip",
@@ -68,6 +69,13 @@ export function ProfileForm() {
         sessionId,
         ...profile,
       });
+      const normalized = await normalizeProfile({ sessionId }).catch(() => null);
+      if (normalized && normalized.languages.length > 0) {
+        await upsert({
+          sessionId,
+          ...normalized,
+        });
+      }
       router.push("/matches");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not save profile");

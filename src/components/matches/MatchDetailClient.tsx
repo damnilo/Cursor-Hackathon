@@ -4,7 +4,7 @@ import { isConvexConfigured } from "@/app/ConvexClientProvider";
 import { useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -23,6 +23,8 @@ export function MatchDetailClient({ repositoryId }: { repositoryId: string }) {
 function MatchDetail({ repositoryId }: { repositoryId: string }) {
   const sessionId = useSessionId();
   const typedId = repositoryId as Id<"repositories">;
+  const generateContribution = useAction(api.ai.contribute.generateContribution);
+  const enrichRepo = useAction(api.ai.enrich.enrichRepo);
   const ensureSuggested = useMutation(api.contributions.ensureSuggested);
   const markCompleted = useMutation(api.contributions.markCompleted);
   const [working, setWorking] = useState(false);
@@ -38,13 +40,30 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
   );
 
   const match = matches?.find((item) => item.repositoryId === repositoryId);
+  const hasMatch = Boolean(match);
 
   useEffect(() => {
-    if (!sessionId || !match) {
+    if (!sessionId || !hasMatch) {
       return;
     }
-    void ensureSuggested({ sessionId, repositoryId: typedId });
-  }, [ensureSuggested, match, repositoryId, sessionId, typedId]);
+    void generateContribution({
+      sessionId,
+      repositoryId: typedId,
+      kind: "first",
+    }).catch(() =>
+      ensureSuggested({ sessionId, repositoryId: typedId }),
+    );
+    void enrichRepo({ repositoryId: typedId }).catch(() => {
+      // Enrichment is optional until repoDocuments exists.
+    });
+  }, [
+    enrichRepo,
+    ensureSuggested,
+    generateContribution,
+    hasMatch,
+    sessionId,
+    typedId,
+  ]);
 
   async function complete() {
     if (!sessionId || !contribution) {
@@ -102,8 +121,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
           </ol>
         ) : (
           <p className="mt-3 text-sm text-slate-400">
-            Deterministic placeholder. Grok will fill a concrete issue path in
-            Phase 3.
+            A first-contribution plan will appear here once it is generated.
           </p>
         )}
         {contribution?.issueUrl ? (

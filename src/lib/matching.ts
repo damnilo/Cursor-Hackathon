@@ -36,6 +36,8 @@ export type MatchResult = VerifiedRepository & {
 /**
  * Official API (do not call `api.repositories.matchRepos` from UI):
  * - `useMutation(api.seed.seedRepositories)` once on first load
+ * - `useMutation(api.profiles.upsert)` then `useAction(api.ai.normalize.normalizeProfile)`
  * - `useQuery(api.matching.matchRepos, { sessionId, limit: 5 })`
- * - Phase 3: `useAction(api.ai.rank.rankMatches)` reranks the same candidates
+ * - `useAction(api.ai.rank.rankMatches)` reranks the same candidates
+ * - `useAction(api.ai.contribute.generateContribution)` fills the plan
  */
