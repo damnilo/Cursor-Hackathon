@@ -36,6 +36,7 @@ yarn-error.log*
 
 # local secrets (API keys) — never commit
 keys.txt
+.auth-keys.json
 
 # vercel
 .vercel
