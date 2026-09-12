@@ -28,7 +28,13 @@ function asStringArray(value: unknown): string[] {
 type Kind = Infer<typeof contributionKindValidator>;
 
 function isVagueStep(step: string): boolean {
-  return /find a good first issue/i.test(step.trim());
+  const text = step.trim();
+  return (
+    /find a good first issue/i.test(text) ||
+    /read( the)? (repo )?(guide|readme|contributing)/i.test(text) ||
+    /open .+ README\.md and CONTRIBUTING/i.test(text) ||
+    /pick a docs or comment typo/i.test(text)
+  );
 }
 
 function concreteFallbackSteps(
@@ -36,15 +42,17 @@ function concreteFallbackSteps(
   issue: GithubIssue | undefined,
 ): string[] {
   if (issue) {
+    const gap =
+      issue.body.length > 0
+        ? issue.body.slice(0, 220)
+        : issue.title;
     return [
-      `Open ${issue.html_url} and read the title, labels, and description for issue #${issue.number}.`,
-      `Fork ${repoFullName} on GitHub, then run: git clone <your-fork-url> && cd ${repoFullName.split("/")[1]}`,
-      `Create a branch: git checkout -b fix/${issue.number}-first-contrib`,
-      `In the files named in issue #${issue.number}, make the smallest change that matches the acceptance criteria.`,
-      `Follow the test or lint command from CONTRIBUTING.md (or package.json scripts) before you commit.`,
-      `Commit with: git commit -m "Fix #${issue.number}: ${issue.title.slice(0, 60)}"`,
-      `Push the branch and open a pull request that links #${issue.number} in the body.`,
-      `Reply on ${issue.html_url} with the PR URL once CI is green.`,
+      `Issue #${issue.number} (${issue.title}): ${gap}`,
+      `Open ${issue.html_url} and note the files, docs page, or behavior named in the description.`,
+      `Fork ${repoFullName}, clone your fork, and create branch fix/${issue.number}-first-contrib.`,
+      `Make the smallest change that closes the gap above — quote the missing or wrong text in the PR.`,
+      `PR title: "Fix #${issue.number}: ${issue.title.slice(0, 70)}". PR body: what was wrong, what you changed, and ${issue.html_url}.`,
+      `Run the lint or test command mentioned in CONTRIBUTING or package.json, then commit and open the PR.`,
     ];
   }
   return [
@@ -132,9 +140,10 @@ export const generateContribution = action({
         "You write a concrete first open-source contribution plan for one student and one repo.",
         "Return ONLY JSON with keys: title, issueUrl, whyThisIssue, steps, skills, timeEstimate.",
         "issueUrl MUST be copied exactly from allowedIssueUrls, or \"\" if that array is empty. Never invent a URL.",
-        "steps MUST be 6 to 8 items. Each step MUST name a file path, a shell command, or an issue number.",
-        "Do not write a step whose only instruction is to find a good first issue.",
-        "whyThisIssue MUST be one concise sentence explaining fit for this student.",
+        "whyThisIssue MUST name the concrete gap (missing docs, wrong example, bug in a file) and why it fits this student.",
+        "steps MUST be 6 to 8 items. Quote the issue title or a phrase from the issue body. Name the file, docs page, or UI where the gap appears.",
+        "Include a step with the suggested PR title and what the PR body should say (problem, change, issue link).",
+        "Do not write steps that only say to clone the repo or only say to read README/CONTRIBUTING.",
         "skills MUST be a non-empty array. timeEstimate MUST be a string such as \"2-4 hours\".",
       ].join(" "),
       JSON.stringify({
@@ -183,7 +192,11 @@ export const generateContribution = action({
       typeof grok.whyThisIssue === "string" &&
       grok.whyThisIssue.trim().length > 0
         ? grok.whyThisIssue.trim()
-        : undefined;
+        : chosenIssue
+          ? `Issue #${chosenIssue.number} (${chosenIssue.title}) is a scoped gap${
+              chosenIssue.body ? `: ${chosenIssue.body.slice(0, 180)}` : ""
+            }.`
+          : undefined;
 
     await ctx.runMutation(internal.ai.store.applyContributionPlan, {
       contributionId,

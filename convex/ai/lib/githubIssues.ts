@@ -19,7 +19,7 @@ type SearchResponse = {
   items?: GithubIssueJson[];
 };
 
-const BODY_LIMIT = 400;
+const BODY_LIMIT = 1500;
 const MAX_ISSUES = 5;
 
 function githubHeaders(): Record<string, string> {

@@ -107,7 +107,9 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
   const completed = contribution?.status === "completed";
   const hasPlan = Boolean(contribution?.steps && contribution.steps.length > 0);
-  const waitingForPlan = !hasPlan && planSettledFor !== typedId;
+  // Always wait for this visit's Grok run. Cached steps from an earlier
+  // session are otherwise shown first, then swapped when the action finishes.
+  const waitingForPlan = planSettledFor !== typedId;
 
   return (
     <div className="mt-10 max-w-3xl">
@@ -131,6 +133,17 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         {contribution?.whyThisIssue ? (
           <p className="mt-3 text-sm leading-relaxed text-slate-300">
             {contribution.whyThisIssue}
+          </p>
+        ) : null}
+        {contribution?.timeEstimate || (contribution?.skills && contribution.skills.length > 0) ? (
+          <p className="mt-3 text-sm text-slate-400">
+            {contribution.timeEstimate ? `${contribution.timeEstimate}` : ""}
+            {contribution.timeEstimate && contribution.skills && contribution.skills.length > 0
+              ? " · "
+              : ""}
+            {contribution.skills && contribution.skills.length > 0
+              ? contribution.skills.join(", ")
+              : ""}
           </p>
         ) : null}
         {contribution?.steps ? (
