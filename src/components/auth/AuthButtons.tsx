@@ -56,7 +56,9 @@ function AuthControls() {
       disabled={working}
       onClick={() => {
         setWorking(true);
-        void signIn("google").finally(() => setWorking(false));
+        void signIn("google", { redirectTo: window.location.href }).finally(
+          () => setWorking(false),
+        );
       }}
         className="inline-flex h-10 items-center rounded-sm bg-sky-500 px-[18px] font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
     >
