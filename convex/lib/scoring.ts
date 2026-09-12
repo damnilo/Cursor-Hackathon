@@ -43,6 +43,17 @@ function overlap(student: string[], repo: string[]): string[] {
   return hits;
 }
 
+function listPhrase(items: string[]): string {
+  if (items.length === 1) {
+    return items[0] ?? "";
+  }
+  if (items.length === 2) {
+    return `${items[0]} and ${items[1]}`;
+  }
+  const last = items[items.length - 1];
+  return `${items.slice(0, -1).join(", ")}, and ${last ?? ""}`;
+}
+
 function ratio(hits: number, total: number): number {
   if (total <= 0) {
     return 0;
@@ -102,22 +113,30 @@ export function scoreRepository(
 
   const reasons: string[] = [];
   if (languageHits.length > 0) {
-    reasons.push(`Languages: ${languageHits.join(", ")}`);
+    reasons.push(
+      `Written in ${listPhrase(languageHits)}, which you already know.`,
+    );
   }
   if (stackHits.length > 0) {
-    reasons.push(`Stack: ${stackHits.join(", ")}`);
+    reasons.push(`Uses ${listPhrase(stackHits)} from your stack.`);
   }
   if (topicHits.length > 0) {
-    reasons.push(`Topics: ${topicHits.join(", ")}`);
+    reasons.push(
+      `Covers ${listPhrase(topicHits)}, which you said you want to work on.`,
+    );
   }
   if (gfiScore > 0) {
-    reasons.push("Has good first issues");
+    reasons.push("Has labeled good first issues, so a first PR stays scoped.");
   }
   if (difficultyScore > 0) {
-    reasons.push(`Difficulty matches ${profile.level}`);
+    reasons.push(
+      profile.level === "beginner"
+        ? "Marked beginner — the same level as your profile."
+        : "Marked intermediate — the same level as your profile.",
+    );
   }
   if (reasons.length === 0) {
-    reasons.push("Passed filters with a weak overlap");
+    reasons.push("Passed the filters, but the overlap with your profile is thin.");
   }
 
   return { score, reasons };

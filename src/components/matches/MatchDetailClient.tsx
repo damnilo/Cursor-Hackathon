@@ -1,6 +1,7 @@
 "use client";
 
 import { isConvexConfigured } from "@/app/ConvexClientProvider";
+import { WhyMatch } from "@/components/matches/MatchCard";
 import { PlanWait } from "@/components/matches/StatusCycle";
 import { useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
@@ -175,11 +176,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       match.description.trim().toLowerCase() ? (
         <p className="mt-4 text-slate-300">{match.newcomerNote}</p>
       ) : null}
-      <ul className="mt-6 space-y-1 text-sm text-slate-400">
-        {match.reasons.map((reason) => (
-          <li key={reason}>• {reason}</li>
-        ))}
-      </ul>
+      <WhyMatch reasons={match.reasons} />
 
       {waitingForPlan ? (
         <PlanWait kind={waitingKind} />
