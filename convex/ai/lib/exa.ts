@@ -12,18 +12,25 @@ export async function findContributingUrl(fullName: string): Promise<string | nu
     return null;
   }
 
-  const response = await fetch("https://api.exa.ai/search", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-    },
-    body: JSON.stringify({
-      query: `CONTRIBUTING site:github.com/${fullName}`,
-      numResults: 3,
-      type: "auto",
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch("https://api.exa.ai/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        query: `CONTRIBUTING site:github.com/${fullName}`,
+        numResults: 3,
+        type: "auto",
+      }),
+      signal: AbortSignal.timeout(6_000),
+    });
+  } catch (error) {
+    console.error("Exa timed out or failed", error);
+    return null;
+  }
 
   if (!response.ok) {
     const body = await response.text();

@@ -48,7 +48,16 @@ function githubHeaders(useToken: boolean): Record<string, string> {
 
 async function githubGet(url: string): Promise<Response> {
   const token = readGithubToken();
-  const authed = await fetch(url, { headers: githubHeaders(true) });
+  let authed: Response;
+  try {
+    authed = await fetch(url, {
+      headers: githubHeaders(true),
+      signal: AbortSignal.timeout(8_000),
+    });
+  } catch (error) {
+    console.error("GitHub timed out or failed", url, error);
+    return new Response(null, { status: 504 });
+  }
   if (authed.ok) {
     return authed;
   }
@@ -60,7 +69,15 @@ async function githubGet(url: string): Promise<Response> {
       body.slice(0, 240),
       "— retrying this request without the token (fine-grained PATs often fail Search API).",
     );
-    return await fetch(url, { headers: githubHeaders(false) });
+    try {
+      return await fetch(url, {
+        headers: githubHeaders(false),
+        signal: AbortSignal.timeout(8_000),
+      });
+    } catch (error) {
+      console.error("GitHub retry timed out or failed", url, error);
+      return new Response(null, { status: 504 });
+    }
   }
   if (!authed.ok) {
     const body = await authed.text();

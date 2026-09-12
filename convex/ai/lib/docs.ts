@@ -52,7 +52,14 @@ export async function loadRepoDocs(
     internal.ai.store.getRepoDocument,
     { repositoryId },
   );
-  if (cached?.readmeMarkdown && cached.contributingMarkdown) {
+  // A completed hunt (hit or miss) must not scrape 15 URLs again.
+  if (
+    cached &&
+    (cached.contributingMarkdown ||
+      cached.source === "none" ||
+      cached.note.includes("no CONTRIBUTING") ||
+      cached.note.includes("no docs"))
+  ) {
     return cached;
   }
 
