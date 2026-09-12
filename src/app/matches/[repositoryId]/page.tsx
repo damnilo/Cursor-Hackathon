@@ -11,7 +11,7 @@ export default async function MatchDetailPage({
 
   return (
     <AppShell>
-      <p className="text-sm font-medium text-sky-400">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sky-400">
         <Link href="/matches" className="hover:text-sky-300">
           ← All matches
         </Link>

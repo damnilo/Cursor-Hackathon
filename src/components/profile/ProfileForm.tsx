@@ -151,7 +151,7 @@ export function ProfileForm() {
           PDF only. We try to prefill languages, stack, and topics — you can
           still edit every chip.
         </p>
-        <label className="mt-4 inline-flex cursor-pointer rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400">
+        <label className="mt-4 inline-flex cursor-pointer rounded-sm border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400">
           <input
             type="file"
             accept="application/pdf,.pdf"
@@ -202,8 +202,8 @@ export function ProfileForm() {
               key={level}
               className={
                 profile.level === level
-                  ? "flex cursor-pointer items-center gap-2 rounded-full bg-sky-500 px-4 py-2 text-sm font-medium text-white"
-                  : "flex cursor-pointer items-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300"
+                  ? "flex cursor-pointer items-center gap-2 rounded-sm bg-sky-500 px-4 py-2 text-sm font-medium text-slate-950"
+                  : "flex cursor-pointer items-center gap-2 rounded-sm border border-slate-700 px-4 py-2 text-sm text-slate-300"
               }
             >
               <input
@@ -245,7 +245,7 @@ export function ProfileForm() {
       <button
         type="submit"
         disabled={saving || !sessionId}
-        className="rounded-full bg-sky-500 px-8 py-3 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:opacity-60"
+        className="rounded-sm bg-sky-500 px-8 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
       >
         {saving ? "Matching…" : "Find my repos"}
       </button>

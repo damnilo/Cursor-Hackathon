@@ -74,7 +74,7 @@ export function MatchCard({
               </span>
             ) : null}
           </div>
-          <h2 className="mt-2 text-xl font-semibold text-white">
+          <h2 className="mt-2 font-mono text-lg font-medium text-slate-100">
             <Link href={`/matches/${repositoryId}`} className="hover:text-sky-300">
               {fullName}
             </Link>
@@ -99,7 +99,7 @@ export function MatchCard({
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
           href={`/matches/${repositoryId}`}
-          className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
+          className="rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
         >
           Open plan
         </Link>

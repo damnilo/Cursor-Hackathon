@@ -150,7 +150,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         </p>
         <Link
           href="/matches"
-          className="mt-4 inline-flex rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
+          className="mt-4 inline-flex rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
         >
           Back to matches
         </Link>
@@ -230,7 +230,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
               type="button"
               disabled={working}
               onClick={() => void requestNext()}
-              className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:opacity-60"
+              className="rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
             >
               {working ? "Preparing…" : "Get next contribution"}
             </button>
@@ -239,7 +239,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
               type="button"
               disabled={working || !contribution}
               onClick={() => void complete()}
-              className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:opacity-60"
+              className="rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
             >
               {working ? "Saving…" : "Mark as completed"}
             </button>
@@ -264,7 +264,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
               href={match.url}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
+              className="rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
             >
               Open the repository on GitHub
             </a>
