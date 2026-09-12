@@ -43,7 +43,7 @@ function AuthControls() {
           setWorking(true);
           void signOut().finally(() => setWorking(false));
         }}
-        className="rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400 disabled:opacity-60"
+        className="rounded-sm border border-slate-600 px-4 py-2 font-mono text-[12px] uppercase tracking-[0.12em] text-slate-200 transition hover:border-slate-400 disabled:opacity-60"
       >
         {working ? "Signing out…" : "Sign out"}
       </button>
@@ -58,7 +58,7 @@ function AuthControls() {
         setWorking(true);
         void signIn("google").finally(() => setWorking(false));
       }}
-      className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:opacity-60"
+        className="inline-flex h-10 items-center rounded-sm bg-sky-500 px-[18px] font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
     >
       {working ? "Opening Google…" : "Sign in with Google"}
     </button>

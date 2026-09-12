@@ -88,7 +88,7 @@ function MatchesList() {
         </p>
         <Link
           href="/profile"
-          className="mt-4 inline-flex rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
+          className="mt-4 inline-flex rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
         >
           Start with your profile
         </Link>

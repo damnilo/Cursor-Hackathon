@@ -35,8 +35,8 @@ export function ChipGroup({
               onClick={() => toggle(option)}
               className={
                 active
-                  ? "rounded-full bg-sky-500 px-3 py-1.5 text-sm font-medium text-white"
-                  : "rounded-full border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:border-slate-500 hover:text-white"
+                  ? "rounded-sm bg-sky-500 px-3 py-1.5 text-sm font-medium text-slate-950"
+                  : "rounded-sm border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:border-slate-500 hover:text-white"
               }
             >
               {option}
