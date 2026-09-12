@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node -e \"const fs=require('fs');const {execSync}=require('child_process');if(!fs.existsSync('node_modules/@convex-dev/auth/dist/react/index.js')){console.log('Installing missing @convex-dev/auth...');execSync('npm install @convex-dev/auth@0.0.95 @auth/core@0.41.1 --no-audit --no-fund',{stdio:'inherit'});}\"",
     "build": "next build",
     "start": "next start -H 0.0.0.0",
     "lint": "eslint",

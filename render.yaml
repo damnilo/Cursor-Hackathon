@@ -4,11 +4,14 @@ services:
     runtime: node
     plan: free
     # --include=dev: NODE_ENV=production would otherwise skip Tailwind/PostCSS.
-    buildCommand: npm install --include=dev && npm run build
+    # npm ci: drop stale node_modules so @convex-dev/auth is actually present.
+    buildCommand: npm ci --include=dev --no-audit --no-fund && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: "22"
       # Must be set in the Render dashboard before the first build (Next inlines NEXT_PUBLIC_*).
       - key: NEXT_PUBLIC_CONVEX_URL
         sync: false
