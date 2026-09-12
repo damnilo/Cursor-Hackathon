@@ -56,7 +56,7 @@ export const generateContribution = action({
     const docs = await loadRepoDocs(ctx, args.repositoryId);
 
     const grokResult = await grokJson(
-      "You write a concrete first open-source contribution plan for a student. Return ONLY JSON with keys title, issueUrl, steps (array of 4-7 short steps), skills (array), timeEstimate (string like '2-4 hours'). issueUrl may be empty.",
+      "You write a concrete first open-source contribution plan for a student. Return ONLY JSON with keys title, issueUrl, whyThisIssue (one sentence: why this issue fits the student), steps (array of 4-7 short steps), skills (array), timeEstimate (string like '2-4 hours'). issueUrl may be empty.",
       JSON.stringify({
         kind,
         student: {
@@ -98,10 +98,17 @@ export const generateContribution = action({
         ? grokResult.timeEstimate.trim()
         : "2-4 hours";
 
+    const whyThisIssue =
+      typeof grokResult.whyThisIssue === "string" &&
+      grokResult.whyThisIssue.trim().length > 0
+        ? grokResult.whyThisIssue.trim()
+        : undefined;
+
     await ctx.runMutation(internal.ai.store.applyContributionPlan, {
       contributionId,
       title,
       issueUrl,
+      whyThisIssue,
       steps:
         steps.length > 0
           ? steps
