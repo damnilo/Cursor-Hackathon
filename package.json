@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -H 0.0.0.0",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed:catalog": "npx convex run repositories:seedCatalog"
   },
   "dependencies": {
     "convex": "^1.45.0",

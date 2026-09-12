@@ -13,8 +13,9 @@ export const studentProfileFields = {
   wantGoodFirstIssue: v.boolean(),
 };
 
-export const matchResultValidator = v.object({
-  repositoryId: v.id("repositories"),
+export const studentProfileValidator = v.object(studentProfileFields);
+
+export const repositoryFields = {
   owner: v.string(),
   name: v.string(),
   fullName: v.string(),
@@ -29,6 +30,21 @@ export const matchResultValidator = v.object({
   difficulty: difficultyValidator,
   newcomerNote: v.string(),
   stars: v.number(),
+  verified: v.literal(true),
+};
+
+export const repositoryValidator = v.object(repositoryFields);
+
+export const contributionKindValidator = v.union(
+  v.literal("first"),
+  v.literal("next"),
+);
+
+export const matchResultFields = {
+  repositoryId: v.id("repositories"),
+  ...repositoryFields,
   score: v.number(),
   reasons: v.array(v.string()),
-});
+};
+
+export const matchResultValidator = v.object(matchResultFields);

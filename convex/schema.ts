@@ -1,47 +1,48 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { difficultyValidator } from "./lib/validators";
+import {
+  contributionKindValidator,
+  difficultyValidator,
+  repositoryFields,
+} from "./lib/validators";
 
 export default defineSchema({
-  repositories: defineTable({
-    owner: v.string(),
-    name: v.string(),
-    fullName: v.string(),
-    url: v.string(),
-    description: v.string(),
-    primaryLanguage: v.string(),
-    languages: v.array(v.string()),
-    topics: v.array(v.string()),
-    stack: v.array(v.string()),
-    hasGoodFirstIssues: v.boolean(),
-    hasContributingGuide: v.boolean(),
-    difficulty: difficultyValidator,
-    newcomerNote: v.string(),
-    stars: v.number(),
-    verified: v.literal(true),
-  })
+  repositories: defineTable(repositoryFields)
     .index("by_fullName", ["fullName"])
     .index("by_difficulty", ["difficulty"])
-    .index("by_primaryLanguage", ["primaryLanguage"]),
+    .index("by_primaryLanguage", ["primaryLanguage"])
+    .index("by_language", ["primaryLanguage"])
+    .index("by_good_first", ["hasGoodFirstIssues"]),
 
   studentProfiles: defineTable({
-    sessionId: v.string(),
+    slug: v.optional(v.string()),
+    label: v.optional(v.string()),
+    sessionId: v.optional(v.string()),
     languages: v.array(v.string()),
     stack: v.array(v.string()),
     topics: v.array(v.string()),
     level: difficultyValidator,
     wantGoodFirstIssue: v.boolean(),
-    updatedAt: v.number(),
-  }).index("by_sessionId", ["sessionId"]),
+    isFixture: v.optional(v.boolean()),
+    updatedAt: v.optional(v.number()),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_sessionId", ["sessionId"]),
 
-  // Filled in Phase 3 (Grok plans) and Phase 4 (mark completed). Schema now so UI/infra can join.
   contributions: defineTable({
-    profileId: v.id("studentProfiles"),
+    profileId: v.optional(v.id("studentProfiles")),
     repositoryId: v.id("repositories"),
-    kind: v.union(v.literal("first"), v.literal("next")),
-    status: v.union(v.literal("suggested"), v.literal("completed")),
+    title: v.optional(v.string()),
+    issueUrl: v.optional(v.string()),
+    steps: v.optional(v.array(v.string())),
+    skills: v.optional(v.array(v.string())),
+    timeEstimate: v.optional(v.string()),
+    kind: contributionKindValidator,
+    status: v.optional(v.union(v.literal("suggested"), v.literal("completed"))),
     completedAt: v.optional(v.number()),
   })
+    .index("by_repository", ["repositoryId"])
+    .index("by_repo_and_kind", ["repositoryId", "kind"])
     .index("by_profile", ["profileId"])
     .index("by_profile_and_repo", ["profileId", "repositoryId"]),
 });
