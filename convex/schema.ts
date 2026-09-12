@@ -1,5 +1,6 @@
 // OWNER: shared freeze for `repositories` and `studentProfiles`.
 // AI track may add optional fields or a new `repoDocuments` table — do not rename existing fields.
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import {
@@ -9,6 +10,8 @@ import {
 } from "./lib/validators";
 
 export default defineSchema({
+  ...authTables,
+
   repositories: defineTable(repositoryFields)
     .index("by_fullName", ["fullName"])
     .index("by_difficulty", ["difficulty"])
@@ -19,6 +22,9 @@ export default defineSchema({
     slug: v.optional(v.string()),
     label: v.optional(v.string()),
     sessionId: v.optional(v.string()),
+    tokenIdentifier: v.optional(v.string()),
+    cvStorageId: v.optional(v.id("_storage")),
+    cvFileName: v.optional(v.string()),
     languages: v.array(v.string()),
     stack: v.array(v.string()),
     topics: v.array(v.string()),
@@ -28,7 +34,8 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
   })
     .index("by_slug", ["slug"])
-    .index("by_sessionId", ["sessionId"]),
+    .index("by_sessionId", ["sessionId"])
+    .index("by_tokenIdentifier", ["tokenIdentifier"]),
 
   contributions: defineTable({
     profileId: v.optional(v.id("studentProfiles")),

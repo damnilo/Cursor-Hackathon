@@ -1,0 +1,66 @@
+"use client";
+
+import { isConvexConfigured } from "@/app/ConvexClientProvider";
+import { useSessionId } from "@/lib/session";
+import { api } from "../../../convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth, useMutation } from "convex/react";
+import { useEffect, useState } from "react";
+
+export function AuthButtons() {
+  if (!isConvexConfigured()) {
+    return null;
+  }
+  return <AuthControls />;
+}
+
+function AuthControls() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { signIn, signOut } = useAuthActions();
+  const sessionId = useSessionId();
+  const linkSession = useMutation(api.profiles.linkSession);
+  const [working, setWorking] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated || !sessionId) {
+      return;
+    }
+    void linkSession({ sessionId }).catch(() => {
+      // Guest profile stays on sessionId until the next save.
+    });
+  }, [isAuthenticated, linkSession, sessionId]);
+
+  if (isLoading) {
+    return <span className="text-sm text-slate-500">…</span>;
+  }
+
+  if (isAuthenticated) {
+    return (
+      <button
+        type="button"
+        disabled={working}
+        onClick={() => {
+          setWorking(true);
+          void signOut().finally(() => setWorking(false));
+        }}
+        className="rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400 disabled:opacity-60"
+      >
+        {working ? "Signing out…" : "Sign out"}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={working}
+      onClick={() => {
+        setWorking(true);
+        void signIn("google").finally(() => setWorking(false));
+      }}
+      className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:opacity-60"
+    >
+      {working ? "Opening Google…" : "Sign in with Google"}
+    </button>
+  );
+}

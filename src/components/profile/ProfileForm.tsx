@@ -9,6 +9,7 @@ import {
 import { useSessionId } from "@/lib/session";
 import type { Difficulty, StudentProfile } from "@/lib/matching";
 import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
@@ -30,7 +31,12 @@ export function ProfileForm() {
 
   const seed = useMutation(api.seed.seedRepositories);
   const upsert = useMutation(api.profiles.upsert);
+  const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
+  const saveCv = useMutation(api.profiles.saveCv);
   const normalizeProfile = useAction(api.ai.normalize.normalizeProfile);
+  const parseCv = useAction(api.ai.parseCv.parseCv);
+  const [cvName, setCvName] = useState<string | null>(null);
+  const [cvWorking, setCvWorking] = useState(false);
   const saved = useQuery(
     api.profiles.getBySession,
     sessionId ? { sessionId } : "skip",
@@ -53,6 +59,63 @@ export function ProfileForm() {
       // Seed is best-effort; matching page will retry.
     });
   }, [seed]);
+
+  useEffect(() => {
+    if (saved?.cvFileName) {
+      setCvName(saved.cvFileName);
+    }
+  }, [saved?.cvFileName]);
+
+  async function onCvSelected(file: File | undefined) {
+    if (!file || !sessionId) {
+      return;
+    }
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      setError("Upload a PDF for now.");
+      return;
+    }
+    setCvWorking(true);
+    setError(null);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const uploaded = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type || "application/pdf" },
+        body: file,
+      });
+      if (!uploaded.ok) {
+        throw new Error("Could not upload the CV");
+      }
+      const payload = (await uploaded.json()) as { storageId?: string };
+      if (typeof payload.storageId !== "string") {
+        throw new Error("Upload did not return a file id");
+      }
+      await saveCv({
+        sessionId,
+        storageId: payload.storageId as Id<"_storage">,
+        fileName: file.name,
+      });
+      setCvName(file.name);
+      const parsed = await parseCv({ sessionId });
+      if (parsed && parsed.languages.length > 0) {
+        setDraft({
+          languages: parsed.languages,
+          stack: parsed.stack,
+          topics: parsed.topics,
+          level: parsed.level,
+          wantGoodFirstIssue: parsed.wantGoodFirstIssue,
+        });
+      } else {
+        setError(
+          "CV is saved. Chip fill from Grok is not ready yet — pick languages manually.",
+        );
+      }
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not read the CV");
+    } finally {
+      setCvWorking(false);
+    }
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -85,6 +148,31 @@ export function ProfileForm() {
 
   return (
     <form onSubmit={(event) => void onSubmit(event)} className="space-y-10">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
+        <p className="text-sm font-medium text-white">CV (optional)</p>
+        <p className="mt-1 text-sm text-slate-400">
+          PDF only. We try to prefill languages, stack, and topics — you can
+          still edit every chip.
+        </p>
+        <label className="mt-4 inline-flex cursor-pointer rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400">
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            className="sr-only"
+            disabled={cvWorking || !sessionId}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              void onCvSelected(file);
+              event.target.value = "";
+            }}
+          />
+          {cvWorking ? "Reading CV…" : "Upload PDF"}
+        </label>
+        {cvName ? (
+          <p className="mt-3 text-sm text-slate-400">Saved: {cvName}</p>
+        ) : null}
+      </div>
+
       <ChipGroup
         label="Languages"
         hint="Required — we only keep repos that share at least one."
