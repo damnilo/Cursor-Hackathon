@@ -7,8 +7,8 @@ export default function ProfilePage() {
       <p className="text-sm font-medium text-sky-400">Step 1 of 3</p>
       <h1 className="mt-4 text-3xl font-bold text-white">Student profile</h1>
       <p className="mt-4 max-w-2xl leading-relaxed text-slate-400">
-        No account. We save this on your browser session, then show ranked
-        matches and a first-PR plan.
+        Sign in with Google if you want a saved profile, or continue as a guest.
+        Upload a PDF CV to prefill chips, then edit them before we match.
       </p>
       <ProfilePageClient />
     </AppShell>

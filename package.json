@@ -11,7 +11,10 @@
     "seed:catalog": "npx convex run repositories:seedCatalog"
   },
   "dependencies": {
+    "@auth/core": "^0.41.1",
+    "@convex-dev/auth": "^0.0.95",
     "convex": "^1.45.0",
+    "jose": "^6.2.12",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",

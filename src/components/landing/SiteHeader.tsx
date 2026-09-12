@@ -1,3 +1,4 @@
+import { AuthButtons } from "@/components/auth/AuthButtons";
 import Link from "next/link";
 
 export function SiteHeader() {
@@ -9,20 +10,23 @@ export function SiteHeader() {
         </div>
         <span className="text-lg font-semibold text-white">FirstContrib</span>
       </Link>
-      <nav className="hidden gap-6 text-sm text-slate-400 sm:flex">
-        <Link href="/#how-it-works" className="transition hover:text-white">
-          How it works
-        </Link>
-        <Link href="/profile" className="transition hover:text-white">
-          Profile
-        </Link>
-        <Link href="/matches" className="transition hover:text-white">
-          Matches
-        </Link>
-        <Link href="/fixtures" className="transition hover:text-white">
-          Test profiles
-        </Link>
-      </nav>
+      <div className="flex items-center gap-4">
+        <nav className="hidden items-center gap-6 text-sm text-slate-400 sm:flex">
+          <Link href="/#how-it-works" className="transition hover:text-white">
+            How it works
+          </Link>
+          <Link href="/profile" className="transition hover:text-white">
+            Profile
+          </Link>
+          <Link href="/matches" className="transition hover:text-white">
+            Matches
+          </Link>
+          <Link href="/fixtures" className="transition hover:text-white">
+            Test profiles
+          </Link>
+        </nav>
+        <AuthButtons />
+      </div>
     </header>
   );
 }

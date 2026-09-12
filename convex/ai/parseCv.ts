@@ -2,6 +2,7 @@
 
 // OWNER: colleague (AI). Prefill catalog chips from a PDF. Does not match or plan.
 import { action } from "../_generated/server";
+import { api } from "../_generated/api";
 import { v } from "convex/values";
 import { difficultyValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
@@ -61,10 +62,7 @@ async function pdfText(buffer: Buffer): Promise<string | null> {
 }
 
 export const parseCv = action({
-  args: {
-    sessionId: v.string(),
-    storageId: v.id("_storage"),
-  },
+  args: { sessionId: v.string() },
   returns: v.object({
     languages: v.array(v.string()),
     stack: v.array(v.string()),
@@ -78,7 +76,14 @@ export const parseCv = action({
       return failed("Invalid session. Pick chips manually.");
     }
 
-    const blob = await ctx.storage.get(args.storageId);
+    const profile = await ctx.runQuery(api.profiles.getBySession, {
+      sessionId: args.sessionId,
+    });
+    if (!profile?.cvStorageId) {
+      return failed("CV file not found. Pick chips manually.");
+    }
+
+    const blob = await ctx.storage.get(profile.cvStorageId);
     if (!blob) {
       return failed("CV file not found. Pick chips manually.");
     }
