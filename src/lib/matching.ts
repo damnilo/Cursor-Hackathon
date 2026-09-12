@@ -1,5 +1,6 @@
 export type Difficulty = "beginner" | "intermediate";
 
+/** Passed to `api.repositories.matchRepos` (no auth — not stored). */
 export type StudentProfile = {
   languages: string[];
   stack: string[];
@@ -30,3 +31,11 @@ export type MatchResult = VerifiedRepository & {
   score: number;
   reasons: string[];
 };
+
+/**
+ * UI track (Phase 2):
+ * - `useMutation(api.repositories.seedCatalog)` once on first load if facets.repositoryCount === 0
+ * - `useQuery(api.repositories.getFacets)` for chip lists
+ * - `useQuery(api.repositories.listSampleProfiles)` for demo "Load sample profile"
+ * - `useQuery(api.repositories.matchRepos, profile)` for top 5 cards
+ */
