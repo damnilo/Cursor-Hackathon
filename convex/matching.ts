@@ -1,3 +1,5 @@
+// OWNER: Lazar (infra). Official matcher — UI and AI actions call this.
+// Do not add a second ranker. Freeze scoring weights unless both owners agree.
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { matchResultValidator, studentProfileFields } from "./lib/validators";
@@ -48,6 +50,7 @@ export const matchRepos = query({
           difficulty: repo.difficulty,
           newcomerNote: repo.newcomerNote,
           stars: repo.stars,
+          verified: true as const,
           score,
           reasons,
         };

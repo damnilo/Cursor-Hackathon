@@ -1,6 +1,6 @@
 export type Difficulty = "beginner" | "intermediate";
 
-/** Passed to `api.repositories.matchRepos` (no auth — not stored). */
+/** Official matcher: `api.matching.matchRepos`. Frozen shared contract. */
 export type StudentProfile = {
   languages: string[];
   stack: string[];
@@ -34,9 +34,8 @@ export type MatchResult = VerifiedRepository & {
 };
 
 /**
- * UI track (Phase 2):
- * - `useMutation(api.repositories.seedCatalog)` once on first load if facets.repositoryCount === 0
- * - `useQuery(api.repositories.getFacets)` for chip lists
- * - `useQuery(api.repositories.listSampleProfiles)` for demo "Load sample profile"
- * - `useQuery(api.repositories.matchRepos, profile)` for top 5 cards
+ * Official API (do not call `api.repositories.matchRepos` from UI):
+ * - `useMutation(api.seed.seedRepositories)` once on first load
+ * - `useQuery(api.matching.matchRepos, { sessionId, limit: 5 })`
+ * - Phase 3: `useAction(api.ai.rank.rankMatches)` reranks the same candidates
  */

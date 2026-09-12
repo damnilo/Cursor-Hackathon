@@ -1,5 +1,8 @@
+import Link from "next/link";
+
 type MatchCardProps = {
   rank: number;
+  repositoryId: string;
   fullName: string;
   url: string;
   description: string;
@@ -9,10 +12,12 @@ type MatchCardProps = {
   score: number;
   reasons: string[];
   newcomerNote: string;
+  completed?: boolean;
 };
 
 export function MatchCard({
   rank,
+  repositoryId,
   fullName,
   url,
   description,
@@ -22,18 +27,26 @@ export function MatchCard({
   score,
   reasons,
   newcomerNote,
+  completed = false,
 }: MatchCardProps) {
   return (
-    <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+    <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 transition hover:border-slate-700">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-sky-400">
-            Match {rank}
-          </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-sky-400">
+              Match {rank}
+            </p>
+            {completed ? (
+              <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300">
+                Completed
+              </span>
+            ) : null}
+          </div>
           <h2 className="mt-2 text-xl font-semibold text-white">
-            <a href={url} target="_blank" rel="noreferrer" className="hover:text-sky-300">
+            <Link href={`/matches/${repositoryId}`} className="hover:text-sky-300">
               {fullName}
-            </a>
+            </Link>
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-400">{description}</p>
         </div>
@@ -54,6 +67,22 @@ export function MatchCard({
           <li key={reason}>• {reason}</li>
         ))}
       </ul>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link
+          href={`/matches/${repositoryId}`}
+          className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400"
+        >
+          Open plan
+        </Link>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-300 transition hover:border-slate-400 hover:text-white"
+        >
+          GitHub
+        </a>
+      </div>
     </article>
   );
 }

@@ -89,6 +89,7 @@ export const runBaselineTests = query({
             difficulty: repo.difficulty,
             newcomerNote: repo.newcomerNote,
             stars: repo.stars,
+            verified: true as const,
             score,
             reasons,
           };

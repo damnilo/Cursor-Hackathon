@@ -8,8 +8,8 @@ export function CtaSection() {
           Ready to contribute?
         </h2>
         <p className="mt-4 text-slate-300">
-          Fill a profile (no account) and we will score curated repos against
-          your languages, stack, and topics.
+          Fill a profile, get 3–5 scored repos, open a plan, and mark your
+          first contribution complete — no account required.
         </p>
         <Link
           href="/profile"

@@ -1,3 +1,5 @@
+// OWNER: shared freeze. Add optional fields only via a dedicated PR.
+// Do not rename StudentProfile / VerifiedRepository fields.
 import { v } from "convex/values";
 
 export const difficultyValidator = v.union(

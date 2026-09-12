@@ -12,8 +12,9 @@ export default function MatchesPage() {
       </p>
       <h1 className="mt-4 text-3xl font-bold text-white">Your matches</h1>
       <p className="mt-4 max-w-2xl leading-relaxed text-slate-400">
-        Deterministic score only — language, stack, topics, difficulty, and good
-        first issues. Grok ranking comes in Phase 3.
+        Explainable scores from language, stack, topics, and good first issues.
+        Open a card for the contribution plan, then mark it complete when you
+        finish.
       </p>
       <MatchesPageClient />
     </AppShell>
