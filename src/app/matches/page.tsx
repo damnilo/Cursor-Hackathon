@@ -1,18 +1,21 @@
+import { AppShell } from "@/components/AppShell";
+import { MatchesPageClient } from "@/components/matches/MatchesPageClient";
 import Link from "next/link";
 
 export default function MatchesPage() {
   return (
-    <main className="mx-auto flex min-h-full max-w-lg flex-col justify-center px-6 py-16">
+    <AppShell>
       <p className="text-sm font-medium text-sky-400">
         <Link href="/profile" className="hover:text-sky-300">
-          ← Profile
+          ← Edit profile
         </Link>
       </p>
-      <h1 className="mt-6 text-3xl font-bold text-white">Your matches</h1>
-      <p className="mt-4 leading-relaxed text-slate-400">
-        Phase 2 will show 3–5 repositories with an explainable score: language
-        overlap, stack, topics, and good-first-issue fit.
+      <h1 className="mt-4 text-3xl font-bold text-white">Your matches</h1>
+      <p className="mt-4 max-w-2xl leading-relaxed text-slate-400">
+        Deterministic score only — language, stack, topics, difficulty, and good
+        first issues. Grok ranking comes in Phase 3.
       </p>
-    </main>
+      <MatchesPageClient />
+    </AppShell>
   );
 }
