@@ -2,6 +2,7 @@
 
 import { isConvexConfigured } from "@/app/ConvexClientProvider";
 import { MatchCard } from "@/components/matches/MatchCard";
+import { RankingWait } from "@/components/matches/StatusCycle";
 import { useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -36,7 +37,10 @@ function MatchesList() {
     api.contributions.listBySession,
     sessionId ? { sessionId } : "skip",
   );
-  const [ranked, setRanked] = useState<typeof matches>(undefined);
+  const [rankResult, setRankResult] = useState<{
+    key: string;
+    items: NonNullable<typeof matches> | null;
+  } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const matchKey = useMemo(
     () => matches?.map((match) => match.repositoryId).join(",") ?? "",
@@ -55,12 +59,12 @@ function MatchesList() {
     void rankMatches({ sessionId, limit: 5 })
       .then((next) => {
         if (!cancelled) {
-          setRanked(next);
+          setRankResult({ key: matchKey, items: next });
         }
       })
       .catch(() => {
         if (!cancelled) {
-          setRanked(undefined);
+          setRankResult({ key: matchKey, items: null });
         }
       });
     return () => {
@@ -68,7 +72,8 @@ function MatchesList() {
     };
   }, [matchKey, rankMatches, sessionId]);
 
-  const shown = ranked ?? matches;
+  const rankedReady = rankResult?.key === matchKey;
+  const shown = rankedReady ? (rankResult.items ?? matches) : undefined;
   const completedIds = new Set(
     (contributions ?? [])
       .filter((row) => row.status === "completed")
@@ -83,16 +88,16 @@ function MatchesList() {
     try {
       await seed({});
       const next = await rankMatches({ sessionId, limit: 5 });
-      setRanked(next);
+      setRankResult({ key: matchKey, items: next });
     } catch {
-      setRanked(undefined);
+      setRankResult({ key: matchKey, items: null });
     } finally {
       setRefreshing(false);
     }
   }
 
   if (!sessionId || profile === undefined || matches === undefined) {
-    return <p className="mt-8 text-slate-400">Scoring curated repositories…</p>;
+    return <RankingWait />;
   }
 
   if (!profile) {
@@ -107,7 +112,7 @@ function MatchesList() {
     );
   }
 
-  if (!shown || shown.length === 0) {
+  if (matches.length === 0) {
     return (
       <p className="mt-8 text-slate-400">
         No repositories passed the filters. Loosen languages or turn off the
@@ -116,12 +121,16 @@ function MatchesList() {
     );
   }
 
+  if (!rankedReady || refreshing || !shown) {
+    return <RankingWait />;
+  }
+
   return (
     <div className="mt-10 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-400">
           Showing {shown.length} matches for {profile.languages.join(", ")}.
-          {ranked ? " Ranked for this session." : " Deterministic baseline."}
+          {rankResult.items ? " Ranked for this session." : " Deterministic fallback."}
         </p>
         <button
           type="button"

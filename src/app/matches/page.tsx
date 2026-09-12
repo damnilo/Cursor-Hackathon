@@ -12,7 +12,7 @@ export default function MatchesPage() {
       </p>
       <h1 className="mt-4 text-3xl font-bold text-white">Your matches</h1>
       <p className="mt-4 max-w-2xl leading-relaxed text-slate-400">
-        Baseline scores first, then a ranked shortlist. Open a card for the
+        We wait for the ranked shortlist before showing cards. Open one for the
         first-contribution plan and mark it complete when you finish.
       </p>
       <MatchesPageClient />

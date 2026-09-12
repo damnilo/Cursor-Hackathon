@@ -1,6 +1,7 @@
 "use client";
 
 import { isConvexConfigured } from "@/app/ConvexClientProvider";
+import { PlanWait } from "@/components/matches/StatusCycle";
 import { useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
@@ -96,6 +97,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
   }
 
   const completed = contribution?.status === "completed";
+  const hasPlan = Boolean(contribution?.steps && contribution.steps.length > 0);
 
   return (
     <div className="mt-10 max-w-3xl">
@@ -111,20 +113,18 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
       <section className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <h2 className="text-lg font-semibold text-white">
-          {contribution?.title ?? "First contribution"}
+          {hasPlan ? contribution?.title : "First contribution"}
         </h2>
-        {contribution?.steps && contribution.steps.length > 0 ? (
+        {hasPlan && contribution?.steps ? (
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-slate-300">
             {contribution.steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
         ) : (
-          <p className="mt-3 text-sm text-slate-400">
-            A first-contribution plan will appear here once it is generated.
-          </p>
+          <PlanWait />
         )}
-        {contribution?.issueUrl ? (
+        {hasPlan && contribution?.issueUrl ? (
           <a
             href={contribution.issueUrl}
             target="_blank"
