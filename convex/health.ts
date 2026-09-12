@@ -5,10 +5,8 @@ export const ping = query({
   args: {},
   returns: v.object({
     status: v.string(),
-    timestamp: v.number(),
   }),
   handler: async () => ({
     status: "ok",
-    timestamp: Date.now(),
   }),
 });

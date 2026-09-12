@@ -3,7 +3,7 @@ const steps = [
     step: "01",
     title: "Tell us about you",
     description:
-      "Skills, languages, experience level, and how much time you can commit each week.",
+      "Languages, stack, topics, experience level, and whether you want a good first issue.",
   },
   {
     step: "02",

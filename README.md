@@ -4,9 +4,11 @@ Help students find their first open source contribution through deterministic ma
 
 ## Phase 1 — Foundation (current)
 
-- Next.js landing page with Convex health check
-- 45 curated beginner-friendly repositories in `data/verified-repos.json`
-- Ready for Phase 2: schema, student profiles, matching
+- Next.js (App Router) landing, stub `/profile` and `/matches`, Convex health check
+- 46 curated beginner-friendly repositories in `data/verified-repos.json`
+- Shared match types in `src/lib/matching.ts`
+- Render blueprint in `render.yaml`
+- Ready for Phase 2: Convex `repositories` seed + deterministic `matchRepos` (profiles stay in the client — no auth)
 
 ## Quick start
 
@@ -23,7 +25,9 @@ npx convex login
 npx convex dev
 ```
 
-This creates `.env.local` with `NEXT_PUBLIC_CONVEX_URL`.
+This creates `.env.local` with `NEXT_PUBLIC_CONVEX_URL`. Keep `npx convex dev` running while you develop. Do **not** run `npx convex deploy` until you intentionally ship a production Convex deployment.
+
+Copy `.env.example` if you need a blank template. Put raw keys in `keys.txt` (gitignored) and copy them into `.env.local` / Convex env / Render — never commit them.
 
 ### 3. Run the app
 
@@ -37,37 +41,40 @@ Open [http://localhost:3000](http://localhost:3000). You should see **Backend co
 
 ## Environment variables
 
-Copy `.env.example` to `.env.local` and fill in values. Never commit `.env` or `.env.local`.
+| Variable | Where | Phase | Purpose |
+|----------|--------|-------|---------|
+| `NEXT_PUBLIC_CONVEX_URL` | Next.js / Render (needed at **build** time) | 1 | Convex client URL |
+| `XAI_API_KEY` | Convex dashboard | 3 | Grok ranking & contribution plans |
+| `FIRECRAWL_API_KEY` | Convex dashboard | 3 | README / CONTRIBUTING scrape |
 
-| Variable | Phase | Purpose |
-|----------|-------|---------|
-| `NEXT_PUBLIC_CONVEX_URL` | 1 | Convex client URL |
-| `XAI_API_KEY` | 3 | Grok ranking & contribution plans |
-| `GITHUB_TOKEN` | 2+ | Repo metadata enrichment |
-| `FC_API_KEY` | 3 | Firecrawl scraping |
-| `EXA_API_KEY` | 3 | Exa enrichment |
+No GitHub token for Phase 1–2: matching uses the curated JSON, not the live GitHub API.
 
 ## Deploy to Render
 
-1. Push to GitHub
-2. Create Convex production deployment: `npx convex deploy`
-3. Render Dashboard → New Web Service → connect repo
-4. Set `NEXT_PUBLIC_CONVEX_URL` to your **production** Convex URL
-5. Build: `npm install && npm run build`
-6. Start: `npm start`
+Convex stays on Convex Cloud. Render only hosts Next.js.
 
-Or use the included [`render.yaml`](render.yaml) Blueprint.
+1. Push to GitHub
+2. New Web Service from [`render.yaml`](render.yaml) (or equivalent dashboard settings)
+3. Set `NEXT_PUBLIC_CONVEX_URL` **before the first build** (Next inlines `NEXT_PUBLIC_*` at build time). A Convex **dev** URL is fine for today's demo.
+4. Build: `npm install && npm run build`
+5. Start: `npm start`
+
+Production Convex (`npx convex deploy`) only after matching works and you want a stable demo URL.
 
 ## Project structure
 
 ```
 data/verified-repos.json   # Curated repos for Phase 2 seed
+data/grok-curation-prompt.md
 convex/                    # Backend (health ping in Phase 1)
 src/app/                   # Next.js App Router
+src/app/profile/           # Stub — form in Phase 2
+src/app/matches/           # Stub — cards in Phase 2
+src/lib/matching.ts        # Shared profile + repo types
 src/components/landing/    # Landing page UI
 ```
 
-## Team split (after Phase 1)
+## Team split
 
-- **UI track:** student profile form, match results, contribution guidance views
+- **UI track:** profile chips, match cards, contribution views
 - **Backend track:** Convex schema, seed import, deterministic filter/score, Grok actions

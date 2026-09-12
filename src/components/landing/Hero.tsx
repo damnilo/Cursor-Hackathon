@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BackendStatus } from "./BackendStatus";
 
 export function Hero() {
@@ -18,15 +19,18 @@ export function Hero() {
           so your first PR is a learning experience, not a wall of confusion.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Link
+            href="/profile"
+            className="rounded-full bg-sky-500 px-8 py-3 text-sm font-semibold text-white transition hover:bg-sky-400"
+          >
+            Start with your profile
+          </Link>
           <a
             href="#how-it-works"
-            className="rounded-full bg-sky-500 px-8 py-3 text-sm font-semibold text-white transition hover:bg-sky-400"
+            className="rounded-full border border-slate-600 px-8 py-3 text-sm font-medium text-slate-300 transition hover:border-slate-400 hover:text-white"
           >
             See how it works
           </a>
-          <span className="rounded-full border border-slate-600 px-8 py-3 text-sm font-medium text-slate-300">
-            Student profiles — coming in Phase 2
-          </span>
         </div>
       </div>
     </section>

@@ -19,7 +19,11 @@ export const metadata: Metadata = {
     "Match with beginner-friendly open source projects and get guided to your first pull request.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="en"
