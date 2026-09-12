@@ -5,13 +5,15 @@ export const difficultyValidator = v.union(
   v.literal("intermediate"),
 );
 
-export const studentProfileValidator = v.object({
+export const studentProfileFields = {
   languages: v.array(v.string()),
   stack: v.array(v.string()),
   topics: v.array(v.string()),
   level: difficultyValidator,
   wantGoodFirstIssue: v.boolean(),
-});
+};
+
+export const studentProfileValidator = v.object(studentProfileFields);
 
 export const repositoryFields = {
   owner: v.string(),
@@ -37,3 +39,12 @@ export const contributionKindValidator = v.union(
   v.literal("first"),
   v.literal("next"),
 );
+
+export const matchResultFields = {
+  repositoryId: v.id("repositories"),
+  ...repositoryFields,
+  score: v.number(),
+  reasons: v.array(v.string()),
+};
+
+export const matchResultValidator = v.object(matchResultFields);

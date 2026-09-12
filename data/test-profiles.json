@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "count": 5,
+  "profiles": [
+    {
+      "name": "Maya — first PR ever",
+      "languages": ["Markdown", "JavaScript"],
+      "stack": [],
+      "topics": ["git", "beginner", "documentation"],
+      "level": "beginner",
+      "wantGoodFirstIssue": true
+    },
+    {
+      "name": "Luka — React / TypeScript student",
+      "languages": ["TypeScript", "JavaScript"],
+      "stack": ["React", "Next.js", "Tailwind"],
+      "topics": ["frontend", "react", "web"],
+      "level": "beginner",
+      "wantGoodFirstIssue": true
+    },
+    {
+      "name": "Ana — Python data science",
+      "languages": ["Python"],
+      "stack": ["Pandas", "NumPy"],
+      "topics": ["data-science", "machine-learning", "documentation"],
+      "level": "intermediate",
+      "wantGoodFirstIssue": false
+    },
+    {
+      "name": "Stefan — Go backend",
+      "languages": ["Go"],
+      "stack": ["Kubernetes"],
+      "topics": ["backend", "cli", "devops"],
+      "level": "intermediate",
+      "wantGoodFirstIssue": true
+    },
+    {
+      "name": "Iva — Rust beginner",
+      "languages": ["Rust"],
+      "stack": [],
+      "topics": ["cli", "compiler", "beginner"],
+      "level": "beginner",
+      "wantGoodFirstIssue": true
+    }
+  ]
+}

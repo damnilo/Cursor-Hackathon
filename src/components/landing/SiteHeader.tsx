@@ -10,14 +10,17 @@ export function SiteHeader() {
         <span className="text-lg font-semibold text-white">FirstContrib</span>
       </Link>
       <nav className="hidden gap-6 text-sm text-slate-400 sm:flex">
-        <a href="#how-it-works" className="transition hover:text-white">
+        <Link href="/#how-it-works" className="transition hover:text-white">
           How it works
-        </a>
+        </Link>
         <Link href="/profile" className="transition hover:text-white">
           Profile
         </Link>
         <Link href="/matches" className="transition hover:text-white">
           Matches
+        </Link>
+        <Link href="/fixtures" className="transition hover:text-white">
+          Test profiles
         </Link>
       </nav>
     </header>
