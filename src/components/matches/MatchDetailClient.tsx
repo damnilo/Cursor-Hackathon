@@ -171,7 +171,10 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       </p>
       <h1 className="mt-3 text-3xl font-bold text-white">{match.fullName}</h1>
       <p className="mt-4 leading-relaxed text-slate-400">{match.description}</p>
-      <p className="mt-4 text-slate-300">{match.newcomerNote}</p>
+      {match.newcomerNote.trim().toLowerCase() !==
+      match.description.trim().toLowerCase() ? (
+        <p className="mt-4 text-slate-300">{match.newcomerNote}</p>
+      ) : null}
       <ul className="mt-6 space-y-1 text-sm text-slate-400">
         {match.reasons.map((reason) => (
           <li key={reason}>• {reason}</li>
