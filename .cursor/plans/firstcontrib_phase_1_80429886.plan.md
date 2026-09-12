@@ -4,19 +4,19 @@ overview: "Postaviti temelj hackathon projekta FirstContrib: naloge i API ključ
 todos:
   - id: accounts-env
     content: Kreirati naloge (Convex, Render, GitHub, xAI) i .env.example sa svim potrebnim varijablama
-    status: in_progress
+    status: completed
   - id: grok-curation
     content: Grok prompt → 60-70 kandidata → ručna verifikacija → data/verified-repos.json (40-50 repoa)
-    status: pending
+    status: completed
   - id: nextjs-convex-scaffold
     content: Scaffoldovati Next.js + Convex (health query, ConvexClientProvider, ESLint plugin)
-    status: pending
+    status: completed
   - id: landing-page
     content: Implementirati landing page sa hero, problem/solution sekcijom i Convex status indikatorom
-    status: pending
+    status: completed
   - id: github-push
     content: Kreirati GitHub remote repo FirstContrib i push-ovati kod
-    status: pending
+    status: completed
   - id: render-deploy
     content: Deploy Next.js na Render sa NEXT_PUBLIC_CONVEX_URL + verifikacija live sajta
     status: pending

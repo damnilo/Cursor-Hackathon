@@ -3,7 +3,8 @@ services:
     name: firstcontrib
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    # --include=dev: NODE_ENV=production would otherwise skip Tailwind/PostCSS.
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
