@@ -130,10 +130,11 @@ export const generateContribution = action({
     const grokResult = await grokJson(
       [
         "You write a concrete first open-source contribution plan for one student and one repo.",
-        "Return ONLY JSON with keys: title, issueUrl, steps, skills, timeEstimate.",
+        "Return ONLY JSON with keys: title, issueUrl, whyThisIssue, steps, skills, timeEstimate.",
         "issueUrl MUST be copied exactly from allowedIssueUrls, or \"\" if that array is empty. Never invent a URL.",
         "steps MUST be 6 to 8 items. Each step MUST name a file path, a shell command, or an issue number.",
         "Do not write a step whose only instruction is to find a good first issue.",
+        "whyThisIssue MUST be one concise sentence explaining fit for this student.",
         "skills MUST be a non-empty array. timeEstimate MUST be a string such as \"2-4 hours\".",
       ].join(" "),
       JSON.stringify({
@@ -178,10 +179,17 @@ export const generateContribution = action({
           ? `Work on #${chosenIssue.number}: ${chosenIssue.title}`
           : `First contribution in ${repo.fullName}`;
 
+    const whyThisIssue =
+      typeof grok.whyThisIssue === "string" &&
+      grok.whyThisIssue.trim().length > 0
+        ? grok.whyThisIssue.trim()
+        : undefined;
+
     await ctx.runMutation(internal.ai.store.applyContributionPlan, {
       contributionId,
       title,
       issueUrl: chosenUrl,
+      whyThisIssue,
       steps: enforceSteps(
         asStringArray(grok.steps),
         repo.fullName,

@@ -1,5 +1,5 @@
 // OWNER: Lazar (infra). Read + status updates only.
-// AI track inserts/updates title, steps, issueUrl via generateContribution.
+// AI track inserts/updates title, steps, issueUrl, whyThisIssue via generateContribution.
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { contributionKindValidator } from "./lib/validators";
@@ -11,6 +11,7 @@ const contributionDoc = v.object({
   repositoryId: v.id("repositories"),
   title: v.optional(v.string()),
   issueUrl: v.optional(v.string()),
+  whyThisIssue: v.optional(v.string()),
   steps: v.optional(v.array(v.string())),
   skills: v.optional(v.array(v.string())),
   timeEstimate: v.optional(v.string()),
