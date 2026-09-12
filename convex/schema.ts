@@ -35,6 +35,7 @@ export default defineSchema({
     repositoryId: v.id("repositories"),
     title: v.optional(v.string()),
     issueUrl: v.optional(v.string()),
+    whyThisIssue: v.optional(v.string()),
     steps: v.optional(v.array(v.string())),
     skills: v.optional(v.array(v.string())),
     timeEstimate: v.optional(v.string()),

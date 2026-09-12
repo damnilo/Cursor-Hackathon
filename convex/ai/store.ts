@@ -62,6 +62,7 @@ export const applyContributionPlan = internalMutation({
     contributionId: v.id("contributions"),
     title: v.string(),
     issueUrl: v.optional(v.string()),
+    whyThisIssue: v.optional(v.string()),
     steps: v.array(v.string()),
     skills: v.array(v.string()),
     timeEstimate: v.string(),
@@ -72,6 +73,7 @@ export const applyContributionPlan = internalMutation({
     await ctx.db.patch("contributions", args.contributionId, {
       title: args.title,
       issueUrl: args.issueUrl,
+      whyThisIssue: args.whyThisIssue,
       steps: args.steps,
       skills: args.skills,
       timeEstimate: args.timeEstimate,

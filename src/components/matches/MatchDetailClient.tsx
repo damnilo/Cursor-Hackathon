@@ -115,6 +115,11 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         <h2 className="text-lg font-semibold text-white">
           {hasPlan ? contribution?.title : "First contribution"}
         </h2>
+        {hasPlan && contribution?.whyThisIssue ? (
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+            {contribution.whyThisIssue}
+          </p>
+        ) : null}
         {hasPlan && contribution?.steps ? (
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-slate-300">
             {contribution.steps.map((step) => (
