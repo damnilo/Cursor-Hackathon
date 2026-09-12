@@ -192,11 +192,16 @@ export async function fetchBeginnerIssues(
       : "token=missing",
   );
 
+  const primary = await listLabeledIssues(owner, name, BEGINNER_LABELS[0]!);
+  if (primary.length > 0) {
+    return primary.slice(0, MAX_ISSUES);
+  }
+
   const labeled = await Promise.all(
-    BEGINNER_LABELS.map((label) => listLabeledIssues(owner, name, label)),
+    BEGINNER_LABELS.slice(1).map((label) => listLabeledIssues(owner, name, label)),
   );
   const fromLabels = mergeIssues(labeled);
-  if (fromLabels.length >= 3) {
+  if (fromLabels.length >= 1) {
     return fromLabels;
   }
 

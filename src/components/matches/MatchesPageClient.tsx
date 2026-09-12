@@ -51,29 +51,8 @@ function MatchesList() {
     void seed({});
   }, [seed]);
 
-  useEffect(() => {
-    if (!sessionId || matchKey.length === 0) {
-      return;
-    }
-    let cancelled = false;
-    void rankMatches({ sessionId, limit: 5 })
-      .then((next) => {
-        if (!cancelled) {
-          setRankResult({ key: matchKey, items: next });
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setRankResult({ key: matchKey, items: null });
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [matchKey, rankMatches, sessionId]);
-
   const rankedReady = rankResult?.key === matchKey;
-  const shown = rankedReady ? (rankResult.items ?? matches) : undefined;
+  const shown = rankedReady ? (rankResult.items ?? matches) : matches;
   const completedIds = new Set(
     (contributions ?? [])
       .filter((row) => row.status === "completed")
@@ -135,7 +114,7 @@ function MatchesList() {
     );
   }
 
-  if (!rankedReady || refreshing || !shown) {
+  if (!shown) {
     return <RankingWait />;
   }
 

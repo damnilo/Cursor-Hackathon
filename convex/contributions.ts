@@ -3,6 +3,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { contributionKindValidator } from "./lib/validators";
+import { findProfile } from "./profiles";
 
 const contributionDoc = v.object({
   _id: v.id("contributions"),
@@ -24,10 +25,11 @@ export const listBySession = query({
   args: { sessionId: v.string() },
   returns: v.array(contributionDoc),
   handler: async (ctx, args) => {
-    const profile = await ctx.db
-      .query("studentProfiles")
-      .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
-      .unique();
+    const identity = await ctx.auth.getUserIdentity();
+    const profile = await findProfile(ctx, {
+      sessionId: args.sessionId,
+      tokenIdentifier: identity?.tokenIdentifier,
+    });
     if (!profile) {
       return [];
     }
@@ -45,10 +47,11 @@ export const getForRepo = query({
   },
   returns: v.union(contributionDoc, v.null()),
   handler: async (ctx, args) => {
-    const profile = await ctx.db
-      .query("studentProfiles")
-      .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
-      .unique();
+    const identity = await ctx.auth.getUserIdentity();
+    const profile = await findProfile(ctx, {
+      sessionId: args.sessionId,
+      tokenIdentifier: identity?.tokenIdentifier,
+    });
     if (!profile) {
       return null;
     }
@@ -69,10 +72,11 @@ export const ensureSuggested = mutation({
   },
   returns: v.union(v.id("contributions"), v.null()),
   handler: async (ctx, args) => {
-    const profile = await ctx.db
-      .query("studentProfiles")
-      .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
-      .unique();
+    const identity = await ctx.auth.getUserIdentity();
+    const profile = await findProfile(ctx, {
+      sessionId: args.sessionId,
+      tokenIdentifier: identity?.tokenIdentifier,
+    });
     const repo = await ctx.db.get("repositories", args.repositoryId);
     if (!profile || !repo) {
       return null;
@@ -105,10 +109,11 @@ export const markCompleted = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const profile = await ctx.db
-      .query("studentProfiles")
-      .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
-      .unique();
+    const identity = await ctx.auth.getUserIdentity();
+    const profile = await findProfile(ctx, {
+      sessionId: args.sessionId,
+      tokenIdentifier: identity?.tokenIdentifier,
+    });
     const contribution = await ctx.db.get("contributions", args.contributionId);
     if (!profile || !contribution) {
       throw new Error("Contribution not found");

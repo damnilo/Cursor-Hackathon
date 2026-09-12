@@ -16,7 +16,7 @@ const profileDoc = v.object({
   ...studentProfileFields,
 });
 
-async function findProfile(
+export async function findProfile(
   ctx: QueryCtx | MutationCtx,
   args: { sessionId: string; tokenIdentifier?: string },
 ) {

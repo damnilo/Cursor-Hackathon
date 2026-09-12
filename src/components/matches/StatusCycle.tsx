@@ -5,13 +5,10 @@ import { useEffect, useState } from "react";
 const RANKING_MESSAGES = [
   "Finding your best matches…",
   "Scoring beginner-friendly repositories…",
-  "Asking Grok to rank the shortlist…",
-  "Picking the clearest first-contribution paths…",
 ];
 
 const FIRST_PLAN_MESSAGES = [
   "Generating your first-contribution plan…",
-  "Reading the repo guide for newcomers…",
   "Looking up beginner-friendly issues…",
   "Asking Grok for a concrete first issue…",
 ];
