@@ -19,16 +19,20 @@ export default defineSchema({
     slug: v.optional(v.string()),
     label: v.optional(v.string()),
     sessionId: v.optional(v.string()),
+    tokenIdentifier: v.optional(v.string()),
     languages: v.array(v.string()),
     stack: v.array(v.string()),
     topics: v.array(v.string()),
     level: difficultyValidator,
     wantGoodFirstIssue: v.boolean(),
+    cvStorageId: v.optional(v.id("_storage")),
+    cvFileName: v.optional(v.string()),
     isFixture: v.optional(v.boolean()),
     updatedAt: v.optional(v.number()),
   })
     .index("by_slug", ["slug"])
-    .index("by_sessionId", ["sessionId"]),
+    .index("by_sessionId", ["sessionId"])
+    .index("by_tokenIdentifier", ["tokenIdentifier"]),
 
   contributions: defineTable({
     profileId: v.optional(v.id("studentProfiles")),

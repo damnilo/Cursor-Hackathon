@@ -5,6 +5,10 @@ export const LANGUAGE_OPTIONS = [
   "Go",
   "Rust",
   "C++",
+  "C",
+  "C#",
+  "Java",
+  "Kotlin",
   "Ruby",
   "PHP",
   "Markdown",
@@ -22,6 +26,12 @@ export const STACK_OPTIONS = [
   "Vite",
   "Kubernetes",
   "Pandas",
+  "Docker",
+  "Terraform",
+  "PyTorch",
+  "FastAPI",
+  "Arduino",
+  "PlatformIO",
 ] as const;
 
 export const TOPIC_OPTIONS = [
@@ -38,4 +48,9 @@ export const TOPIC_OPTIONS = [
   "git",
   "testing",
   "data-science",
+  "embedded",
+  "mlops",
+  "firmware",
+  "cloud",
+  "systems",
 ] as const;

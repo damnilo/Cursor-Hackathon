@@ -8,6 +8,7 @@ Grok / Firecrawl live in this folder. Do not edit `convex/matching.ts` or scorin
 - `api.ai.rank.rankMatches({ sessionId, limit? })` — **always** starts from `api.matching.matchRepos` with `limit: 15`, then Grok reorders to top 3–5. Falls back to deterministic order.
 - `api.ai.enrich.enrichRepo({ repositoryId })` — Firecrawl README + CONTRIBUTING, cached in `repoDocuments`.
 - `api.ai.contribute.generateContribution({ sessionId, repositoryId, kind? })` — `kind: "first"` vs `"next"` use different prompts and issue picks. `issueUrl` is copied from the GitHub beginner-issue list or left empty.
+- `api.ai.parseCv.parseCv({ sessionId, storageId })` — reads a PDF from Convex storage (`unpdf`), maps text onto catalog chips via Grok. Returns chips + `error` (null on success). Does **not** upsert the profile, call `matchRepos`, or write contributions. Empty/failed parse leaves the manual form as the fallback. Daytona is out of this cut.
 
 ## Env (Convex dashboard)
 

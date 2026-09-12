@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "curatedAt": "2026-03-12",
-  "count": 46,
+  "curatedAt": "2026-09-12",
+  "count": 58,
   "repositories": [
     {
       "owner": "firstcontributions",
@@ -1211,6 +1211,296 @@
       "difficulty": "beginner",
       "newcomerNote": "Ansible documentation — accessible DevOps doc contributions.",
       "stars": 120,
+      "verified": true
+    },
+    {
+      "owner": "zephyrproject-rtos",
+      "name": "zephyr",
+      "fullName": "zephyrproject-rtos/zephyr",
+      "url": "https://github.com/zephyrproject-rtos/zephyr",
+      "description": "Zephyr RTOS — C firmware and docs issues for embedded newcomers.",
+      "primaryLanguage": "C",
+      "languages": [
+        "C"
+      ],
+      "topics": [
+        "embedded",
+        "firmware",
+        "systems"
+      ],
+      "stack": [],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Labeled beginner issues in docs, samples, and board support — scoped C/embedded work.",
+      "stars": 16000,
+      "verified": true
+    },
+    {
+      "owner": "espressif",
+      "name": "arduino-esp32",
+      "fullName": "espressif/arduino-esp32",
+      "url": "https://github.com/espressif/arduino-esp32",
+      "description": "Arduino core for ESP32 — firmware, examples, and board docs.",
+      "primaryLanguage": "C++",
+      "languages": [
+        "C++",
+        "C"
+      ],
+      "topics": [
+        "embedded",
+        "firmware"
+      ],
+      "stack": [
+        "Arduino"
+      ],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Example sketches and docs are a common first PR for Arduino students.",
+      "stars": 17000,
+      "verified": true
+    },
+    {
+      "owner": "platformio",
+      "name": "platformio-core",
+      "fullName": "platformio/platformio-core",
+      "url": "https://github.com/platformio/platformio-core",
+      "description": "PlatformIO core CLI — embedded tooling with docs and CLI fixes.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "embedded",
+        "firmware",
+        "cli"
+      ],
+      "stack": [
+        "PlatformIO"
+      ],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Docs, board metadata, and small CLI help text are newcomer-sized.",
+      "stars": 9500,
+      "verified": true
+    },
+    {
+      "owner": "tiangolo",
+      "name": "fastapi",
+      "fullName": "tiangolo/fastapi",
+      "url": "https://github.com/tiangolo/fastapi",
+      "description": "FastAPI framework — docs and example fixes are the usual first PR.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "backend",
+        "documentation"
+      ],
+      "stack": [
+        "FastAPI"
+      ],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Documentation and tutorial examples are explicitly welcomed from newcomers.",
+      "stars": 102000,
+      "verified": true
+    },
+    {
+      "owner": "terraform-docs",
+      "name": "terraform-docs",
+      "fullName": "terraform-docs/terraform-docs",
+      "url": "https://github.com/terraform-docs/terraform-docs",
+      "description": "Generates Terraform module docs — Go CLI with beginner doc/output issues.",
+      "primaryLanguage": "Go",
+      "languages": [
+        "Go"
+      ],
+      "topics": [
+        "devops",
+        "documentation",
+        "cloud"
+      ],
+      "stack": [
+        "Terraform"
+      ],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Docs, output formats, and example modules are scoped first contributions.",
+      "stars": 4800,
+      "verified": true
+    },
+    {
+      "owner": "mlflow",
+      "name": "mlflow",
+      "fullName": "mlflow/mlflow",
+      "url": "https://github.com/mlflow/mlflow",
+      "description": "MLflow — MLOps tracking platform with docs and example contributions.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "mlops",
+        "machine-learning",
+        "documentation"
+      ],
+      "stack": [],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Docs and example tracking scripts are the usual newcomer path.",
+      "stars": 28000,
+      "verified": true
+    },
+    {
+      "owner": "iterative",
+      "name": "dvc",
+      "fullName": "iterative/dvc",
+      "url": "https://github.com/iterative/dvc",
+      "description": "DVC — data versioning for MLOps; docs and CLI help are beginner-friendly.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "mlops",
+        "machine-learning",
+        "cli"
+      ],
+      "stack": [],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Documentation and command-help wording are labeled for first-time contributors.",
+      "stars": 16000,
+      "verified": true
+    },
+    {
+      "owner": "iluwatar",
+      "name": "java-design-patterns",
+      "fullName": "iluwatar/java-design-patterns",
+      "url": "https://github.com/iluwatar/java-design-patterns",
+      "description": "Java design patterns catalog — docs and example-class contributions.",
+      "primaryLanguage": "Java",
+      "languages": [
+        "Java"
+      ],
+      "topics": [
+        "education",
+        "backend",
+        "documentation"
+      ],
+      "stack": [],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Adding a small example or fixing pattern docs is a classic first Java PR.",
+      "stars": 95000,
+      "verified": true
+    },
+    {
+      "owner": "JetBrains",
+      "name": "kotlin-web-site",
+      "fullName": "JetBrains/kotlin-web-site",
+      "url": "https://github.com/JetBrains/kotlin-web-site",
+      "description": "Official Kotlin website and docs — Markdown/Kotlin content fixes.",
+      "primaryLanguage": "TypeScript",
+      "languages": [
+        "Kotlin",
+        "TypeScript",
+        "Markdown"
+      ],
+      "topics": [
+        "documentation",
+        "education",
+        "web"
+      ],
+      "stack": [],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Doc typos and tutorial snippets are the intended first contributions.",
+      "stars": 1600,
+      "verified": true
+    },
+    {
+      "owner": "dotnet",
+      "name": "AspNetCore.Docs",
+      "fullName": "dotnet/AspNetCore.Docs",
+      "url": "https://github.com/dotnet/AspNetCore.Docs",
+      "description": "ASP.NET Core documentation — C# samples and writing fixes.",
+      "primaryLanguage": "C#",
+      "languages": [
+        "C#",
+        "Markdown"
+      ],
+      "topics": [
+        "documentation",
+        "backend",
+        "cloud"
+      ],
+      "stack": [],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Doc and code-sample PRs are how most students land a first .NET contribution.",
+      "stars": 13000,
+      "verified": true
+    },
+    {
+      "owner": "pytorch",
+      "name": "tutorials",
+      "fullName": "pytorch/tutorials",
+      "url": "https://github.com/pytorch/tutorials",
+      "description": "PyTorch tutorials — notebook and wording fixes for ML beginners.",
+      "primaryLanguage": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [
+        "machine-learning",
+        "education",
+        "documentation"
+      ],
+      "stack": [
+        "PyTorch"
+      ],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Tutorial notebooks and broken links are scoped, reviewable first PRs.",
+      "stars": 9300,
+      "verified": true
+    },
+    {
+      "owner": "docker",
+      "name": "docs",
+      "fullName": "docker/docs",
+      "url": "https://github.com/docker/docs",
+      "description": "Docker documentation — guides for containers, Compose, and cloud.",
+      "primaryLanguage": "Markdown",
+      "languages": [
+        "Markdown"
+      ],
+      "topics": [
+        "documentation",
+        "devops",
+        "cloud"
+      ],
+      "stack": [
+        "Docker"
+      ],
+      "hasGoodFirstIssues": true,
+      "hasContributingGuide": true,
+      "difficulty": "beginner",
+      "newcomerNote": "Docs-only PRs with a clear style guide — a common first DevOps contribution.",
+      "stars": 4700,
       "verified": true
     }
   ]
