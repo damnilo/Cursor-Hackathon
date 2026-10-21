@@ -1,11 +1,11 @@
 "use client";
 
 import { isConvexConfigured } from "@/app/ConvexClientProvider";
-import { useSessionId } from "@/lib/session";
+import { clearSessionId, useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useMutation } from "convex/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function AuthButtons() {
   if (!isConvexConfigured()) {
@@ -21,9 +21,10 @@ function AuthControls() {
   const linkSession = useMutation(api.profiles.linkSession);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const signingOut = useRef(false);
 
   useEffect(() => {
-    if (!isAuthenticated || !sessionId) {
+    if (signingOut.current || !isAuthenticated || !sessionId) {
       return;
     }
     void linkSession({ sessionId }).catch(() => {
@@ -41,9 +42,17 @@ function AuthControls() {
         type="button"
         disabled={working}
         onClick={() => {
+          signingOut.current = true;
           setWorking(true);
           setError(null);
-          void signOut().finally(() => setWorking(false));
+          void signOut()
+            .then(() => {
+              clearSessionId();
+            })
+            .finally(() => {
+              signingOut.current = false;
+              setWorking(false);
+            });
         }}
         className="rounded-sm border border-slate-600 px-4 py-2 font-mono text-[12px] uppercase tracking-[0.12em] text-slate-200 transition hover:border-slate-400 disabled:opacity-60"
       >

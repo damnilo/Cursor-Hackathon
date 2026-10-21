@@ -6,7 +6,7 @@ import {
   STACK_OPTIONS,
   TOPIC_OPTIONS,
 } from "@/lib/catalogs";
-import { useSessionId } from "@/lib/session";
+import { clearSessionId, getSessionId, useSessionId } from "@/lib/session";
 import type { Difficulty, StudentProfile } from "@/lib/matching";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
@@ -21,6 +21,29 @@ const emptyProfile: StudentProfile = {
   level: "beginner",
   wantGoodFirstIssue: true,
 };
+
+function isUnauthorized(caught: unknown): boolean {
+  return caught instanceof Error && caught.message.includes("Unauthorized");
+}
+
+/** A sessionId already linked to Google cannot start a new guest row. Mint a fresh one and retry once. */
+async function writableSession(
+  sessionId: string,
+  write: (sessionId: string) => Promise<void>,
+): Promise<string> {
+  try {
+    await write(sessionId);
+    return sessionId;
+  } catch (caught) {
+    if (!isUnauthorized(caught)) {
+      throw caught;
+    }
+    clearSessionId();
+    const next = getSessionId();
+    await write(next);
+    return next;
+  }
+}
 
 export function ProfileForm() {
   const router = useRouter();
@@ -85,13 +108,15 @@ export function ProfileForm() {
       if (typeof payload.storageId !== "string") {
         throw new Error("Upload did not return a file id");
       }
-      await saveCv({
-        sessionId,
-        storageId: payload.storageId as Id<"_storage">,
-        fileName: file.name,
+      const cvSession = await writableSession(sessionId, async (id) => {
+        await saveCv({
+          sessionId: id,
+          storageId: payload.storageId as Id<"_storage">,
+          fileName: file.name,
+        });
       });
       setUploadedCvName(file.name);
-      const parsed = await parseCv({ sessionId });
+      const parsed = await parseCv({ sessionId: cvSession });
       if (parsed && parsed.languages.length > 0) {
         setDraft({
           languages: parsed.languages,
@@ -125,16 +150,23 @@ export function ProfileForm() {
 
     setSaving(true);
     try {
-      await upsert({
-        sessionId,
-        ...profile,
-      });
-      const normalized = await normalizeProfile({ sessionId }).catch(() => null);
-      if (normalized && normalized.languages.length > 0) {
+      const savedSession = await writableSession(sessionId, async (id) => {
         await upsert({
-          sessionId,
-          ...normalized,
+          sessionId: id,
+          ...profile,
         });
+        const normalized = await normalizeProfile({ sessionId: id }).catch(
+          () => null,
+        );
+        if (normalized && normalized.languages.length > 0) {
+          await upsert({
+            sessionId: id,
+            ...normalized,
+          });
+        }
+      });
+      if (!savedSession) {
+        throw new Error("Could not save profile");
       }
       router.push("/matches");
     } catch (caught) {
