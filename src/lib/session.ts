@@ -4,6 +4,14 @@ import { useSyncExternalStore } from "react";
 
 const SESSION_KEY = "firstcontrib.sessionId";
 
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
 export function getSessionId(): string {
   if (typeof window === "undefined") {
     return "";
@@ -19,9 +27,20 @@ export function getSessionId(): string {
   return sessionId;
 }
 
+export function clearSessionId(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.localStorage.removeItem(SESSION_KEY);
+  emit();
+}
+
 export function useSessionId(): string {
   return useSyncExternalStore(
-    () => () => undefined,
+    (onStoreChange) => {
+      listeners.add(onStoreChange);
+      return () => listeners.delete(onStoreChange);
+    },
     getSessionId,
     () => "",
   );
