@@ -38,6 +38,9 @@ yarn-error.log*
 keys.txt
 .auth-keys.json
 
+# local fix checklist — not part of the app
+/workflow-fixes.md
+
 # vercel
 .vercel
 
