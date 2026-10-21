@@ -18,6 +18,14 @@ export default defineSchema({
     .index("by_primaryLanguage", ["primaryLanguage"])
     .index("by_good_first", ["hasGoodFirstIssues"]),
 
+  // Singleton marker so page loads skip rewriting the catalog.
+  // This Convex version has no unique index, so seed collapses duplicate fullNames itself.
+  catalogMeta: defineTable({
+    key: v.literal("verified-repos"),
+    version: v.number(),
+    curatedAt: v.string(),
+  }).index("by_key", ["key"]),
+
   studentProfiles: defineTable({
     slug: v.optional(v.string()),
     label: v.optional(v.string()),

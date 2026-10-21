@@ -3,15 +3,10 @@
 import { mutation, query } from "./_generated/server";
 import { Infer, v } from "convex/values";
 import schema from "./schema";
+import { syncCuratedRepositories } from "./lib/catalogSync";
 import { SAMPLE_PROFILES } from "./data/sampleProfiles";
-import { VERIFIED_REPOS } from "./data/verifiedRepos";
 import { rankRepos, uniqueSorted } from "./lib/matching";
-import {
-  repositoryValidator,
-  studentProfileValidator,
-} from "./lib/validators";
-
-type CatalogRepo = Infer<typeof repositoryValidator>;
+import { studentProfileValidator } from "./lib/validators";
 
 const MAX_CATALOG = 80;
 
@@ -25,30 +20,10 @@ const sampleProfileValidator = studentProfileValidator.extend({
   label: v.string(),
 });
 
-function readCatalogRepos(): CatalogRepo[] {
-  return VERIFIED_REPOS.map((repo): CatalogRepo => ({
-    owner: repo.owner,
-    name: repo.name,
-    fullName: repo.fullName,
-    url: repo.url,
-    description: repo.description,
-    primaryLanguage: repo.primaryLanguage,
-    languages: [...repo.languages],
-    stack: [...repo.stack],
-    topics: [...repo.topics],
-    hasGoodFirstIssues: repo.hasGoodFirstIssues,
-    hasContributingGuide: repo.hasContributingGuide,
-    difficulty:
-      repo.difficulty === "beginner" ? "beginner" : "intermediate",
-    newcomerNote: repo.newcomerNote,
-    stars: repo.stars,
-    verified: true,
-  }));
-}
-
 /**
  * Phase 2 API for the UI track:
- * - seedCatalog() once (idempotent)
+ * - seedCatalog() once (idempotent). Repo rows go through the same upsert as
+ *   `seed.seedRepositories`.
  * - getFacets() for chip lists
  * - listSampleProfiles() for the "load sample" demo button
  * - matchRepos(profile) → top 3–5 scored repos
@@ -60,22 +35,8 @@ export const seedCatalog = mutation({
     profilesUpserted: v.number(),
   }),
   handler: async (ctx) => {
-    const repos = readCatalogRepos();
-    let repositoriesUpserted = 0;
-
-    for (const repo of repos) {
-      const existing = await ctx.db
-        .query("repositories")
-        .withIndex("by_fullName", (q) => q.eq("fullName", repo.fullName))
-        .unique();
-
-      if (existing) {
-        await ctx.db.patch("repositories", existing._id, repo);
-      } else {
-        await ctx.db.insert("repositories", repo);
-      }
-      repositoriesUpserted += 1;
-    }
+    const synced = await syncCuratedRepositories(ctx);
+    const repositoriesUpserted = synced.inserted + synced.updated;
 
     let profilesUpserted = 0;
     for (const profile of SAMPLE_PROFILES) {
