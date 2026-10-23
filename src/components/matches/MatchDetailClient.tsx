@@ -27,11 +27,12 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
   const sessionId = useSessionId();
   const typedId = repositoryId as Id<"repositories">;
   const generateContribution = useAction(api.ai.contribute.generateContribution);
-  const ensureSuggested = useMutation(api.contributions.ensureSuggested);
   const markCompleted = useMutation(api.contributions.markCompleted);
   const [working, setWorking] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [planSettledFor, setPlanSettledFor] = useState<string | null>(null);
+  const [failure, setFailure] = useState<{
+    repositoryId: string;
+    message: string;
+  } | null>(null);
   const [waitingKind, setWaitingKind] = useState<"first" | "next">("first");
   const autoStartedFor = useRef<string | null>(null);
 
@@ -66,43 +67,34 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
     const hasSteps = Boolean(firstPlan?.steps && firstPlan.steps.length > 0);
     let cancelled = false;
-    const settle = () => {
-      if (!cancelled) {
-        setPlanSettledFor(typedId);
-      }
-    };
     void generateContribution({
       sessionId,
       repositoryId: typedId,
       kind: "first",
     })
-      .catch((caught) => {
-        const notice = actionNotice(caught);
-        if (notice) {
-          setError(notice);
-          return undefined;
+      .then((planId) => {
+        if (cancelled || hasSteps) {
+          return;
         }
-        if (!hasSteps) {
-          return ensureSuggested({ sessionId, repositoryId: typedId });
+        if (!planId) {
+          setFailure({
+            repositoryId: typedId,
+            message: "Could not generate a plan yet.",
+          });
         }
-        return undefined;
       })
-      .finally(settle);
-    if (hasSteps) {
-      return () => {
-        cancelled = true;
-      };
-    }
-    const timeout = window.setTimeout(() => {
-      settle();
-    }, 22_000);
+      .catch((caught) => {
+        if (cancelled) {
+          return;
+        }
+        const notice = actionNotice(caught) ?? "Could not generate a plan yet.";
+        setFailure({ repositoryId: typedId, message: notice });
+      });
     return () => {
       cancelled = true;
-      window.clearTimeout(timeout);
     };
   }, [
     firstPlan,
-    ensureSuggested,
     generateContribution,
     hasMatch,
     sessionId,
@@ -114,11 +106,14 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       return;
     }
     setWorking(true);
-    setError(null);
+    setFailure(null);
     try {
       await markCompleted({ sessionId, contributionId: firstPlan._id });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not update");
+      setFailure({
+        repositoryId: typedId,
+        message: caught instanceof Error ? caught.message : "Could not update",
+      });
     } finally {
       setWorking(false);
     }
@@ -129,7 +124,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       return;
     }
     setWorking(true);
-    setError(null);
+    setFailure(null);
     try {
       await generateContribution({
         sessionId,
@@ -138,10 +133,12 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         force: true,
       });
     } catch (caught) {
-      setError(
-        actionNotice(caught) ??
+      setFailure({
+        repositoryId: typedId,
+        message:
+          actionNotice(caught) ??
           (caught instanceof Error ? caught.message : "Could not refresh the plan"),
-      );
+      });
     } finally {
       setWorking(false);
     }
@@ -152,9 +149,8 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       return;
     }
     setWorking(true);
-    setError(null);
+    setFailure(null);
     setWaitingKind("next");
-    setPlanSettledFor(null);
     try {
       await generateContribution({
         sessionId,
@@ -162,19 +158,15 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         kind: "next",
       });
     } catch (caught) {
-      setError(
-        actionNotice(caught) ??
+      setFailure({
+        repositoryId: typedId,
+        message:
+          actionNotice(caught) ??
           (caught instanceof Error
             ? caught.message
             : "Could not generate the next plan"),
-      );
-      await ensureSuggested({
-        sessionId,
-        repositoryId: typedId,
-        kind: "next",
       });
     } finally {
-      setPlanSettledFor(typedId);
       setWorking(false);
     }
   }
@@ -204,7 +196,9 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
   const completed = firstPlan?.status === "completed";
   const hasPlan = Boolean(firstPlan?.steps && firstPlan.steps.length > 0);
   const hasNextPlan = Boolean(nextPlan?.steps && nextPlan.steps.length > 0);
-  const waitingForPlan = planSettledFor !== typedId && !hasPlan;
+  const notice = failure?.repositoryId === repositoryId ? failure.message : null;
+  const planFailed = Boolean(notice) && !hasPlan;
+  const waitingForPlan = !hasPlan && !planFailed;
   const waitingForNext = working && waitingKind === "next" && !hasNextPlan;
 
   return (
@@ -337,11 +331,13 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
               : "Marked as completed. Ask for the next plan when you are ready."}
           </p>
         ) : null}
-        {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
+        {notice ? <p className="mt-3 text-sm text-rose-300">{notice}</p> : null}
       </section>
       ) : (
         <div className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-          <p className="text-slate-200">Could not generate a plan yet.</p>
+          <p className="text-slate-200">
+            {notice ?? "Could not generate a plan yet."}
+          </p>
           <p className="mt-2 text-sm text-slate-400">
             The repository is still a match — open it on GitHub, or go back and
             try another card.

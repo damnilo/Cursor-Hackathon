@@ -106,6 +106,7 @@ export const ensureSuggested = mutation({
       kind,
       status: "suggested",
     });
+    // No steps yet. The detail page keeps waiting until a plan is written.
     const keeper = await collapseContributions(
       ctx,
       profile._id,
