@@ -5,7 +5,8 @@ import { Infer, v } from "convex/values";
 import schema from "./schema";
 import { syncCuratedRepositories } from "./lib/catalogSync";
 import { SAMPLE_PROFILES } from "./data/sampleProfiles";
-import { rankRepos, uniqueSorted } from "./lib/matching";
+import { uniqueSorted } from "./lib/matching";
+import { rankWithOfficialScore } from "./lib/scoring";
 import { studentProfileValidator } from "./lib/validators";
 
 const MAX_CATALOG = 80;
@@ -118,14 +119,11 @@ export const matchRepos = query({
   args: studentProfileValidator.fields,
   returns: v.array(matchResultValidator),
   handler: async (ctx, profile) => {
+    if (profile.languages.length === 0) {
+      return [];
+    }
     const repos = await ctx.db.query("repositories").take(MAX_CATALOG);
-    const ranked = rankRepos(repos, profile, 5);
-
-    return ranked.map(({ repo, score, reasons }) => ({
-      ...repo,
-      score,
-      reasons,
-    }));
+    return rankWithOfficialScore(repos, profile).slice(0, 5);
   },
 });
 
@@ -143,12 +141,12 @@ export const evaluateFixtures = query({
   handler: async (ctx) => {
     const repos = await ctx.db.query("repositories").take(MAX_CATALOG);
     return SAMPLE_PROFILES.map((profile) => {
-      const ranked = rankRepos(repos, profile, 5);
+      const ranked = rankWithOfficialScore(repos, profile).slice(0, 5);
       return {
         slug: profile.slug,
         label: profile.label,
         matchCount: ranked.length,
-        topFullNames: ranked.map((item) => item.repo.fullName),
+        topFullNames: ranked.map((item) => item.fullName),
         topScores: ranked.map((item) => item.score),
       };
     });

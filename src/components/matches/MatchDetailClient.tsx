@@ -3,6 +3,7 @@
 import { isConvexConfigured } from "@/app/ConvexClientProvider";
 import { WhyMatch } from "@/components/matches/MatchCard";
 import { PlanWait } from "@/components/matches/StatusCycle";
+import { actionNotice } from "@/lib/actionNotice";
 import { useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
@@ -75,7 +76,12 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       repositoryId: typedId,
       kind: "first",
     })
-      .catch(() => {
+      .catch((caught) => {
+        const notice = actionNotice(caught);
+        if (notice) {
+          setError(notice);
+          return undefined;
+        }
         if (!hasSteps) {
           return ensureSuggested({ sessionId, repositoryId: typedId });
         }
@@ -133,7 +139,8 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       });
     } catch (caught) {
       setError(
-        caught instanceof Error ? caught.message : "Could not refresh the plan",
+        actionNotice(caught) ??
+          (caught instanceof Error ? caught.message : "Could not refresh the plan"),
       );
     } finally {
       setWorking(false);
@@ -156,9 +163,10 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       });
     } catch (caught) {
       setError(
-        caught instanceof Error
-          ? caught.message
-          : "Could not generate the next plan",
+        actionNotice(caught) ??
+          (caught instanceof Error
+            ? caught.message
+            : "Could not generate the next plan"),
       );
       await ensureSuggested({
         sessionId,

@@ -2,7 +2,7 @@
 
 // OWNER: colleague (AI). Prefill catalog chips from a PDF. Does not match or plan.
 import { action } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import { v } from "convex/values";
 import { difficultyValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
@@ -13,6 +13,7 @@ import {
   TOPIC_OPTIONS,
 } from "./lib/catalog";
 import { extractText, getDocumentProxy } from "unpdf";
+import { PARSE_LIMIT_MESSAGE } from "../lib/aiQuota";
 
 const MAX_PDF_BYTES = 8 * 1024 * 1024;
 const MIN_TEXT_CHARS = 40;
@@ -102,6 +103,14 @@ export const parseCv = action({
     }
     if (text.length < MIN_TEXT_CHARS) {
       return failed("No readable text in that PDF. Pick chips manually.");
+    }
+
+    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "parse",
+    });
+    if (!quota.allowed) {
+      return failed(PARSE_LIMIT_MESSAGE);
     }
 
     const grokResult = await grokJson(

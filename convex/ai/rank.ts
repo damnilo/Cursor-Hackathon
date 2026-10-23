@@ -3,9 +3,10 @@
 // OWNER: colleague (AI). Rerank with Grok. Must keep runQuery(matching.matchRepos).
 import { action } from "../_generated/server";
 import { api, internal } from "../_generated/api";
-import { Infer, v } from "convex/values";
+import { Infer, v, ConvexError } from "convex/values";
 import { matchResultValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
+import { RERANK_LIMIT_MESSAGE } from "../lib/aiQuota";
 
 type RankedMatch = Infer<typeof matchResultValidator>;
 
@@ -35,6 +36,16 @@ export const rankMatches = action({
     const profile = await ctx.runQuery(api.profiles.getBySession, {
       sessionId: args.sessionId,
     });
+    if (!profile) {
+      return candidates.slice(0, limit);
+    }
+    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "rerank",
+    });
+    if (!quota.allowed) {
+      throw new ConvexError(RERANK_LIMIT_MESSAGE);
+    }
 
     const grokResult = await grokJson(
       "You rerank beginner-friendly GitHub repos for one student. Return ONLY JSON: {\"order\":[\"owner/name\"],\"why\":{\"owner/name\":\"one sentence\"}}. order must be a subset of the given fullNames, best first.",

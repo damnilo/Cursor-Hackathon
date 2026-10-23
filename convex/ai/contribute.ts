@@ -3,7 +3,7 @@
 // OWNER: colleague (AI). Replace ensureSuggested with Grok first/next plans.
 import { action } from "../_generated/server";
 import { api, internal } from "../_generated/api";
-import { Infer, v } from "convex/values";
+import { Infer, v, ConvexError } from "convex/values";
 import { contributionKindValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
 import {
@@ -13,6 +13,7 @@ import {
 } from "./lib/githubIssues";
 import { Id } from "../_generated/dataModel";
 import { firstPlanIsFresh } from "../lib/planFreshness";
+import { PLAN_LIMIT_MESSAGE } from "../lib/aiQuota";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -208,6 +209,14 @@ export const generateContribution = action({
       })
     ) {
       return contributionId;
+    }
+
+    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "plan",
+    });
+    if (!quota.allowed) {
+      throw new ConvexError(PLAN_LIMIT_MESSAGE);
     }
 
     const previousUrl = previous?.issueUrl;
