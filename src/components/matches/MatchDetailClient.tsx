@@ -58,17 +58,12 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
     if (!sessionId || !hasMatch || firstPlan === undefined) {
       return;
     }
-    if (
-      firstPlan?.status === "completed" ||
-      (firstPlan?.steps && firstPlan.steps.length > 0)
-    ) {
-      return;
-    }
     if (autoStartedFor.current === typedId) {
       return;
     }
     autoStartedFor.current = typedId;
 
+    const hasSteps = Boolean(firstPlan?.steps && firstPlan.steps.length > 0);
     let cancelled = false;
     const settle = () => {
       if (!cancelled) {
@@ -80,8 +75,18 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       repositoryId: typedId,
       kind: "first",
     })
-      .catch(() => ensureSuggested({ sessionId, repositoryId: typedId }))
+      .catch(() => {
+        if (!hasSteps) {
+          return ensureSuggested({ sessionId, repositoryId: typedId });
+        }
+        return undefined;
+      })
       .finally(settle);
+    if (hasSteps) {
+      return () => {
+        cancelled = true;
+      };
+    }
     const timeout = window.setTimeout(() => {
       void ensureSuggested({ sessionId, repositoryId: typedId }).finally(settle);
     }, 22_000);
@@ -108,6 +113,28 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       await markCompleted({ sessionId, contributionId: firstPlan._id });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not update");
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function refreshPlan() {
+    if (!sessionId) {
+      return;
+    }
+    setWorking(true);
+    setError(null);
+    try {
+      await generateContribution({
+        sessionId,
+        repositoryId: typedId,
+        kind: "first",
+        force: true,
+      });
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : "Could not refresh the plan",
+      );
     } finally {
       setWorking(false);
     }
@@ -263,6 +290,14 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
           >
             Open on GitHub
           </a>
+          <button
+            type="button"
+            disabled={working}
+            onClick={() => void refreshPlan()}
+            className="rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400 disabled:opacity-60"
+          >
+            {working ? "Preparing…" : "Refresh plan"}
+          </button>
           {completed ? (
             <button
               type="button"

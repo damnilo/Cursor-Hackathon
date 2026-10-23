@@ -57,6 +57,7 @@ export default defineSchema({
     kind: contributionKindValidator,
     status: v.optional(v.union(v.literal("suggested"), v.literal("completed"))),
     completedAt: v.optional(v.number()),
+    profileUpdatedAt: v.optional(v.number()),
   })
     .index("by_repository", ["repositoryId"])
     .index("by_repo_and_kind", ["repositoryId", "kind"])
