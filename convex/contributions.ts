@@ -2,6 +2,7 @@
 // AI track inserts/updates title, steps, issueUrl, whyThisIssue via generateContribution.
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { findContributionByKind } from "./lib/contributionLookup";
 import { contributionKindValidator } from "./lib/validators";
 import { findProfile } from "./profiles";
 
@@ -44,6 +45,7 @@ export const getForRepo = query({
   args: {
     sessionId: v.string(),
     repositoryId: v.id("repositories"),
+    kind: contributionKindValidator,
   },
   returns: v.union(contributionDoc, v.null()),
   handler: async (ctx, args) => {
@@ -55,12 +57,12 @@ export const getForRepo = query({
     if (!profile) {
       return null;
     }
-    return await ctx.db
-      .query("contributions")
-      .withIndex("by_profile_and_repo", (q) =>
-        q.eq("profileId", profile._id).eq("repositoryId", args.repositoryId),
-      )
-      .unique();
+    return await findContributionByKind(
+      ctx,
+      profile._id,
+      args.repositoryId,
+      args.kind,
+    );
   },
 });
 
@@ -82,12 +84,13 @@ export const ensureSuggested = mutation({
       return null;
     }
 
-    const existing = await ctx.db
-      .query("contributions")
-      .withIndex("by_profile_and_repo", (q) =>
-        q.eq("profileId", profile._id).eq("repositoryId", args.repositoryId),
-      )
-      .unique();
+    const kind = args.kind ?? "first";
+    const existing = await findContributionByKind(
+      ctx,
+      profile._id,
+      args.repositoryId,
+      kind,
+    );
     if (existing) {
       return existing._id;
     }
@@ -95,8 +98,11 @@ export const ensureSuggested = mutation({
     return await ctx.db.insert("contributions", {
       profileId: profile._id,
       repositoryId: args.repositoryId,
-      title: `First contribution in ${repo.fullName}`,
-      kind: args.kind ?? "first",
+      title:
+        kind === "next"
+          ? `Next contribution in ${repo.fullName}`
+          : `First contribution in ${repo.fullName}`,
+      kind,
       status: "suggested",
     });
   },

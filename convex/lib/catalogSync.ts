@@ -1,6 +1,7 @@
 import type { MutationCtx } from "../_generated/server";
 import type { Doc, Id } from "../_generated/dataModel";
 import curatedJson from "../data/verified-repos.json";
+import { findContributionByKind } from "./contributionLookup";
 
 export type CuratedRepo = {
   owner: string;
@@ -148,12 +149,7 @@ async function repointContributions(
     }
     for (const row of rows) {
       const clash = row.profileId
-        ? await ctx.db
-            .query("contributions")
-            .withIndex("by_profile_and_repo", (q) =>
-              q.eq("profileId", row.profileId).eq("repositoryId", keepId),
-            )
-            .first()
+        ? await findContributionByKind(ctx, row.profileId, keepId, row.kind)
         : null;
       if (!clash) {
         await ctx.db.patch("contributions", row._id, { repositoryId: keepId });

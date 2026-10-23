@@ -38,21 +38,29 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
     api.matching.matchRepos,
     sessionId ? { sessionId, limit: 15 } : "skip",
   );
-  const contribution = useQuery(
+  const firstPlan = useQuery(
     api.contributions.getForRepo,
-    sessionId ? { sessionId, repositoryId: typedId } : "skip",
+    sessionId
+      ? { sessionId, repositoryId: typedId, kind: "first" as const }
+      : "skip",
+  );
+  const nextPlan = useQuery(
+    api.contributions.getForRepo,
+    sessionId
+      ? { sessionId, repositoryId: typedId, kind: "next" as const }
+      : "skip",
   );
 
   const match = matches?.find((item) => item.repositoryId === repositoryId);
   const hasMatch = Boolean(match);
 
   useEffect(() => {
-    if (!sessionId || !hasMatch || contribution === undefined) {
+    if (!sessionId || !hasMatch || firstPlan === undefined) {
       return;
     }
     if (
-      contribution?.status === "completed" ||
-      (contribution?.steps && contribution.steps.length > 0)
+      firstPlan?.status === "completed" ||
+      (firstPlan?.steps && firstPlan.steps.length > 0)
     ) {
       return;
     }
@@ -82,7 +90,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       window.clearTimeout(timeout);
     };
   }, [
-    contribution,
+    firstPlan,
     ensureSuggested,
     generateContribution,
     hasMatch,
@@ -91,13 +99,13 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
   ]);
 
   async function complete() {
-    if (!sessionId || !contribution) {
+    if (!sessionId || !firstPlan) {
       return;
     }
     setWorking(true);
     setError(null);
     try {
-      await markCompleted({ sessionId, contributionId: contribution._id });
+      await markCompleted({ sessionId, contributionId: firstPlan._id });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not update");
     } finally {
@@ -136,7 +144,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
     }
   }
 
-  if (!sessionId || matches === undefined || contribution === undefined) {
+  if (!sessionId || matches === undefined || firstPlan === undefined || nextPlan === undefined) {
     return <p className="mt-8 text-slate-400">Loading match…</p>;
   }
 
@@ -158,9 +166,11 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
     );
   }
 
-  const completed = contribution?.status === "completed";
-  const hasPlan = Boolean(contribution?.steps && contribution.steps.length > 0);
+  const completed = firstPlan?.status === "completed";
+  const hasPlan = Boolean(firstPlan?.steps && firstPlan.steps.length > 0);
+  const hasNextPlan = Boolean(nextPlan?.steps && nextPlan.steps.length > 0);
   const waitingForPlan = planSettledFor !== typedId && !hasPlan;
+  const waitingForNext = working && waitingKind === "next" && !hasNextPlan;
 
   return (
     <div className="mt-10 max-w-3xl">
@@ -178,37 +188,37 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
       {waitingForPlan ? (
         <PlanWait kind={waitingKind} />
-      ) : hasPlan ? (
+      ) : hasPlan && firstPlan ? (
       <section className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <h2 className="text-lg font-semibold text-white">
-          {contribution?.title}
+          {firstPlan.title}
         </h2>
-        {contribution?.whyThisIssue ? (
+        {firstPlan.whyThisIssue ? (
           <p className="mt-3 text-sm leading-relaxed text-slate-300">
-            {contribution.whyThisIssue}
+            {firstPlan.whyThisIssue}
           </p>
         ) : null}
-        {contribution?.timeEstimate || (contribution?.skills && contribution.skills.length > 0) ? (
+        {firstPlan.timeEstimate || (firstPlan.skills && firstPlan.skills.length > 0) ? (
           <p className="mt-3 text-sm text-slate-400">
-            {contribution.timeEstimate ? `${contribution.timeEstimate}` : ""}
-            {contribution.timeEstimate && contribution.skills && contribution.skills.length > 0
+            {firstPlan.timeEstimate ? `${firstPlan.timeEstimate}` : ""}
+            {firstPlan.timeEstimate && firstPlan.skills && firstPlan.skills.length > 0
               ? " · "
               : ""}
-            {contribution.skills && contribution.skills.length > 0
-              ? contribution.skills.join(", ")
+            {firstPlan.skills && firstPlan.skills.length > 0
+              ? firstPlan.skills.join(", ")
               : ""}
           </p>
         ) : null}
-        {contribution?.steps ? (
+        {firstPlan.steps ? (
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-slate-300">
-            {contribution.steps.map((step) => (
+            {firstPlan.steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
         ) : null}
-        {contribution?.issueUrl ? (
+        {firstPlan.issueUrl ? (
           <a
-            href={contribution.issueUrl}
+            href={firstPlan.issueUrl}
             target="_blank"
             rel="noreferrer"
             className="mt-4 inline-block text-sm text-sky-400 hover:text-sky-300"
@@ -216,6 +226,34 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
             Open suggested issue
           </a>
         ) : null}
+        {hasNextPlan && nextPlan ? (
+          <div className="mt-8 border-t border-slate-800 pt-6">
+            <h3 className="text-lg font-semibold text-white">{nextPlan.title}</h3>
+            {nextPlan.whyThisIssue ? (
+              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                {nextPlan.whyThisIssue}
+              </p>
+            ) : null}
+            {nextPlan.steps ? (
+              <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-slate-300">
+                {nextPlan.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            ) : null}
+            {nextPlan.issueUrl ? (
+              <a
+                href={nextPlan.issueUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-block text-sm text-sky-400 hover:text-sky-300"
+              >
+                Open the next issue
+              </a>
+            ) : null}
+          </div>
+        ) : null}
+        {waitingForNext ? <PlanWait kind="next" /> : null}
         <div className="mt-6 flex flex-wrap gap-3">
           <a
             href={match.url}
@@ -232,12 +270,16 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
               onClick={() => void requestNext()}
               className="rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
             >
-              {working ? "Preparing…" : "Get next contribution"}
+              {working
+                ? "Preparing…"
+                : hasNextPlan
+                  ? "Refresh next plan"
+                  : "Get next contribution"}
             </button>
           ) : (
             <button
               type="button"
-              disabled={working || !contribution}
+              disabled={working || !firstPlan}
               onClick={() => void complete()}
               className="rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:opacity-60"
             >
@@ -247,7 +289,9 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         </div>
         {completed ? (
           <p className="mt-3 text-sm text-emerald-300">
-            Marked as completed. Ask for the next plan when you are ready.
+            {hasNextPlan
+              ? "The first plan stays completed. The next plan is below."
+              : "Marked as completed. Ask for the next plan when you are ready."}
           </p>
         ) : null}
         {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}

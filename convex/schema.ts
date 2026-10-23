@@ -61,7 +61,8 @@ export default defineSchema({
     .index("by_repository", ["repositoryId"])
     .index("by_repo_and_kind", ["repositoryId", "kind"])
     .index("by_profile", ["profileId"])
-    .index("by_profile_and_repo", ["profileId", "repositoryId"]),
+    .index("by_profile_and_repo", ["profileId", "repositoryId"])
+    .index("by_profile_repo_and_kind", ["profileId", "repositoryId", "kind"]),
 
   // AI track cache for Firecrawl README / CONTRIBUTING. Do not rename other tables.
   repoDocuments: defineTable({

@@ -180,6 +180,7 @@ export const generateContribution = action({
       ctx.runQuery(api.contributions.getForRepo, {
         sessionId: args.sessionId,
         repositoryId: args.repositoryId,
+        kind: "first",
       }),
       ctx.runQuery(internal.ai.store.getRepoDocument, {
         repositoryId: args.repositoryId,
