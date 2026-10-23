@@ -1,6 +1,7 @@
 import { internalMutation, internalQuery } from "../_generated/server";
 import { v } from "convex/values";
 import { contributionKindValidator } from "../lib/validators";
+import { docsHuntFinished } from "../lib/docsHunt";
 import schema from "../schema";
 
 export const getRepository = internalQuery({
@@ -115,5 +116,32 @@ export const saveRerank = internalMutation({
       rerankForUpdatedAt: profile.updatedAt,
     });
     return null;
+  },
+});
+
+export const nextDocsBatch = internalQuery({
+  args: { limit: v.number() },
+  returns: v.array(
+    v.object({
+      repositoryId: v.id("repositories"),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const repos = await ctx.db.query("repositories").take(100);
+    const pending: { repositoryId: (typeof repos)[number]["_id"] }[] = [];
+    for (const repo of repos) {
+      const doc = await ctx.db
+        .query("repoDocuments")
+        .withIndex("by_repository", (q) => q.eq("repositoryId", repo._id))
+        .first();
+      if (docsHuntFinished(doc)) {
+        continue;
+      }
+      pending.push({ repositoryId: repo._id });
+      if (pending.length >= args.limit) {
+        break;
+      }
+    }
+    return pending;
   },
 });

@@ -381,9 +381,14 @@ export const linkSession = mutation({
 });
 
 export const generateUploadUrl = mutation({
-  args: {},
+  args: { sessionId: v.string() },
   returns: v.string(),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
+    if (args.sessionId.trim().length < 8) {
+      throw new Error("Unauthorized");
+    }
+    const identity = await ctx.auth.getUserIdentity();
+    await assertSessionWritable(ctx, args.sessionId, identity?.tokenIdentifier);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -426,6 +431,9 @@ export const saveCv = mutation({
       cvFileName: args.fileName,
       updatedAt: Date.now(),
     });
+    if (existing.cvStorageId && existing.cvStorageId !== args.storageId) {
+      await deleteStorage(ctx, existing.cvStorageId);
+    }
     return existing._id;
   },
 });

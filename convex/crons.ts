@@ -10,4 +10,11 @@ crons.interval(
   {},
 );
 
+crons.interval(
+  "refresh repo readme cache",
+  { minutes: 15 },
+  internal.ai.enrich.refreshRepoDocs,
+  {},
+);
+
 export default crons;
