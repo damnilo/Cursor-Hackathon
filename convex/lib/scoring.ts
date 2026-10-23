@@ -23,7 +23,6 @@ const WEIGHTS = {
   language: 40,
   stack: 25,
   topics: 20,
-  goodFirstIssue: 10,
   difficulty: 5,
 };
 
@@ -68,16 +67,9 @@ function languageScore(profile: MatchProfile, repo: ScorableRepo, hits: string[]
   if (hits.length === 0) {
     return 0;
   }
-  const preferred = profile.languages[0];
-  const primary = repo.primaryLanguage;
-  const primaryIsPreferred =
-    Boolean(preferred) && normalize(primary) === normalize(preferred);
-  const primaryIsKnown = overlap(profile.languages, [primary]).length > 0;
-  if (primaryIsPreferred) {
-    return WEIGHTS.language;
-  }
+  const primaryIsKnown = overlap(profile.languages, [repo.primaryLanguage]).length > 0;
   if (primaryIsKnown) {
-    return Math.round(WEIGHTS.language * 0.85);
+    return WEIGHTS.language;
   }
   return Math.round(WEIGHTS.language * 0.65);
 }
@@ -105,10 +97,6 @@ export function passesHardFilters(
     return false;
   }
 
-  if (profile.level === "beginner" && repo.difficulty !== "beginner") {
-    return false;
-  }
-
   return true;
 }
 
@@ -123,24 +111,25 @@ export function scoreRepository(
   const stackHits = overlap(profile.stack, repo.stack);
   const topicHits = overlap(profile.topics, repo.topics);
 
-  const gfiScore =
-    profile.wantGoodFirstIssue && repo.hasGoodFirstIssues
-      ? WEIGHTS.goodFirstIssue
-      : 0;
   const difficultyScore =
     profile.level === repo.difficulty ? WEIGHTS.difficulty : 0;
-  const guideScore = repo.hasContributingGuide ? 5 : 0;
+  // Every catalog repo currently has the same good-first and guide flags,
+  // so those points do not change order. Live issue counts replace them later.
+  const levelPenalty =
+    profile.level === "beginner" && repo.difficulty === "intermediate" ? 15 : 0;
 
-  const score = Math.min(
-    100,
-    Math.round(
-      languageScore(profile, repo, languageHits) +
-        overlapScore(stackHits.length, WEIGHTS.stack) +
-        overlapScore(topicHits.length, WEIGHTS.topics) +
-        gfiScore +
-        difficultyScore +
-        guideScore +
-        starScore(repo.stars),
+  const score = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(
+        languageScore(profile, repo, languageHits) +
+          overlapScore(stackHits.length, WEIGHTS.stack) +
+          overlapScore(topicHits.length, WEIGHTS.topics) +
+          difficultyScore -
+          levelPenalty +
+          starScore(repo.stars),
+      ),
     ),
   );
 
@@ -158,9 +147,6 @@ export function scoreRepository(
       `Covers ${listPhrase(topicHits)}, which you said you want to work on.`,
     );
   }
-  if (gfiScore > 0) {
-    reasons.push("Has labeled good first issues, so a first PR stays scoped.");
-  }
   if (difficultyScore > 0) {
     reasons.push(
       profile.level === "beginner"
@@ -168,9 +154,25 @@ export function scoreRepository(
         : "Marked intermediate — the same level as your profile.",
     );
   }
+  if (levelPenalty > 0) {
+    reasons.push(
+      "Marked intermediate, so it ranks after beginner repos in the same language.",
+    );
+  }
   if (reasons.length === 0) {
     reasons.push("Passed the filters, but the overlap with your profile is thin.");
   }
 
   return { score, reasons };
+}
+
+export function compareByLevelThenScore<
+  T extends { difficulty: Difficulty; score: number; stars: number },
+>(level: Difficulty, a: T, b: T): number {
+  const aBucket = a.difficulty === level ? 0 : 1;
+  const bBucket = b.difficulty === level ? 0 : 1;
+  if (aBucket !== bBucket) {
+    return aBucket - bBucket;
+  }
+  return b.score - a.score || b.stars - a.stars;
 }

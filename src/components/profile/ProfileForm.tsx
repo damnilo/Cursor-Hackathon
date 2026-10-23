@@ -56,7 +56,6 @@ export function ProfileForm() {
   const upsert = useMutation(api.profiles.upsert);
   const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
   const saveCv = useMutation(api.profiles.saveCv);
-  const normalizeProfile = useAction(api.ai.normalize.normalizeProfile);
   const parseCv = useAction(api.ai.parseCv.parseCv);
   const [uploadedCvName, setUploadedCvName] = useState<string | null>(null);
   const [cvWorking, setCvWorking] = useState(false);
@@ -155,15 +154,6 @@ export function ProfileForm() {
           sessionId: id,
           ...profile,
         });
-        const normalized = await normalizeProfile({ sessionId: id }).catch(
-          () => null,
-        );
-        if (normalized && normalized.languages.length > 0) {
-          await upsert({
-            sessionId: id,
-            ...normalized,
-          });
-        }
       });
       if (!savedSession) {
         throw new Error("Could not save profile");

@@ -1,7 +1,7 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { matchResultValidator } from "./lib/validators";
-import { passesHardFilters, scoreRepository, type MatchProfile } from "./lib/scoring";
+import { compareByLevelThenScore, passesHardFilters, scoreRepository, type MatchProfile } from "./lib/scoring";
 
 export const TEST_PROFILES: Array<{ name: string; profile: MatchProfile }> = [
   {
@@ -94,7 +94,7 @@ export const runBaselineTests = query({
             reasons,
           };
         })
-        .sort((a, b) => b.score - a.score || b.stars - a.stars);
+        .sort((a, b) => compareByLevelThenScore(profile.level, a, b));
 
       return {
         name,
