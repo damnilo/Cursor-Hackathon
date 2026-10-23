@@ -20,6 +20,7 @@ const contributionDoc = v.object({
   kind: contributionKindValidator,
   status: v.optional(v.union(v.literal("suggested"), v.literal("completed"))),
   completedAt: v.optional(v.number()),
+  profileUpdatedAt: v.optional(v.number()),
 });
 
 export const listBySession = query({

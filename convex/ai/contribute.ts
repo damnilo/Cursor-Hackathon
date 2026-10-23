@@ -12,6 +12,7 @@ import {
   type GithubIssue,
 } from "./lib/githubIssues";
 import { Id } from "../_generated/dataModel";
+import { firstPlanIsFresh } from "../lib/planFreshness";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -151,6 +152,7 @@ export const generateContribution = action({
     sessionId: v.string(),
     repositoryId: v.id("repositories"),
     kind: v.optional(contributionKindValidator),
+    force: v.optional(v.boolean()),
   },
   returns: v.union(v.id("contributions"), v.null()),
   handler: async (ctx, args): Promise<Id<"contributions"> | null> => {
@@ -189,18 +191,25 @@ export const generateContribution = action({
     if (!profile || !repo) {
       return contributionId;
     }
+
+    // Cached README/CONTRIBUTING is enough. Issues decide whether the saved
+    // plan is still open; an empty list means GitHub did not answer, so keep it.
+    const issues = await fetchBeginnerIssues(repo.owner, repo.name);
+    const allowedUrls = issues.map((issue) => issue.html_url);
     if (
       kind === "first" &&
-      previous?.steps &&
-      previous.steps.length > 0
+      firstPlanIsFresh({
+        force: args.force,
+        stepCount: previous?.steps?.length ?? 0,
+        profileUpdatedAt: profile.updatedAt,
+        planProfileUpdatedAt: previous?.profileUpdatedAt,
+        savedIssueUrl: previous?.issueUrl,
+        openIssueUrls: allowedUrls,
+      })
     ) {
       return contributionId;
     }
 
-    // Do not scrape Firecrawl/Exa on this path — that hunt is 8s per URL and
-    // blocked the plan. Cached README/CONTRIBUTING is enough; issues drive quality.
-    const issues = await fetchBeginnerIssues(repo.owner, repo.name);
-    const allowedUrls = issues.map((issue) => issue.html_url);
     const previousUrl = previous?.issueUrl;
     const hasOtherIssue = issues.some(
       (issue) => issue.html_url !== previousUrl,
@@ -314,6 +323,7 @@ export const generateContribution = action({
             ? "2-3 hours"
             : "2-4 hours",
       kind,
+      profileUpdatedAt: profile.updatedAt ?? Date.now(),
     });
 
     return contributionId;

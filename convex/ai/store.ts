@@ -67,6 +67,7 @@ export const applyContributionPlan = internalMutation({
     skills: v.array(v.string()),
     timeEstimate: v.string(),
     kind: contributionKindValidator,
+    profileUpdatedAt: v.optional(v.number()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -84,6 +85,7 @@ export const applyContributionPlan = internalMutation({
       steps: args.steps,
       skills: args.skills,
       timeEstimate: args.timeEstimate,
+      profileUpdatedAt: args.profileUpdatedAt,
     });
     return null;
   },

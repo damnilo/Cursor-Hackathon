@@ -144,6 +144,7 @@ async function moveContribution(
       kind: row.kind,
       status: row.status,
       completedAt: row.completedAt,
+      profileUpdatedAt: row.profileUpdatedAt,
     });
   }
   await ctx.db.delete("contributions", row._id);
