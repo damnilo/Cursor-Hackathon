@@ -1,8 +1,9 @@
 "use node";
 
 // OWNER: colleague (AI). Firecrawl README / CONTRIBUTING. Cached in repoDocuments.
-import { action } from "../_generated/server";
+import { internal } from "../_generated/api";
 import { v } from "convex/values";
+import { action, internalAction } from "../_generated/server";
 import { loadRepoDocs } from "./lib/docs";
 
 export const enrichRepo = action({
@@ -26,5 +27,38 @@ export const enrichRepo = action({
       enriched,
       note: docs?.note ?? "Repository not found.",
     };
+  },
+});
+
+const DOCS_BATCH = 1;
+
+/** Fills README / CONTRIBUTING off the click path. One repo per run. */
+export const refreshRepoDocs = internalAction({
+  args: {},
+  returns: v.object({
+    checked: v.number(),
+    failed: v.number(),
+  }),
+  handler: async (ctx) => {
+    const batch = await ctx.runQuery(internal.ai.store.nextDocsBatch, {
+      limit: DOCS_BATCH,
+    });
+    let checked = 0;
+    let failed = 0;
+    for (const repo of batch) {
+      try {
+        await loadRepoDocs(ctx, repo.repositoryId);
+        checked += 1;
+      } catch (error) {
+        console.error("repo docs refresh failed", repo.repositoryId, error);
+        await ctx.runMutation(internal.ai.store.upsertRepoDocument, {
+          repositoryId: repo.repositoryId,
+          source: "none",
+          note: "Firecrawl returned no docs; matching can continue without enrichment.",
+        });
+        failed += 1;
+      }
+    }
+    return { checked, failed };
   },
 });

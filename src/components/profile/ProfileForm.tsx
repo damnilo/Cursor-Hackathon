@@ -94,7 +94,10 @@ export function ProfileForm() {
     setCvWorking(true);
     setError(null);
     try {
-      const uploadUrl = await generateUploadUrl();
+      let uploadUrl = "";
+      const cvSession = await writableSession(sessionId, async (id) => {
+        uploadUrl = await generateUploadUrl({ sessionId: id });
+      });
       const uploaded = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": file.type || "application/pdf" },
@@ -107,7 +110,7 @@ export function ProfileForm() {
       if (typeof payload.storageId !== "string") {
         throw new Error("Upload did not return a file id");
       }
-      const cvSession = await writableSession(sessionId, async (id) => {
+      const savedSession = await writableSession(cvSession, async (id) => {
         await saveCv({
           sessionId: id,
           storageId: payload.storageId as Id<"_storage">,
@@ -115,8 +118,12 @@ export function ProfileForm() {
         });
       });
       setUploadedCvName(file.name);
-      const parsed = await parseCv({ sessionId: cvSession });
-      if (parsed && parsed.languages.length > 0) {
+      const parsed = await parseCv({ sessionId: savedSession });
+      const filled =
+        parsed.languages.length > 0 ||
+        parsed.stack.length > 0 ||
+        parsed.topics.length > 0;
+      if (filled && !parsed.error) {
         setDraft({
           languages: parsed.languages,
           stack: parsed.stack,
@@ -124,7 +131,12 @@ export function ProfileForm() {
           level: parsed.level,
           wantGoodFirstIssue: parsed.wantGoodFirstIssue,
         });
-      } else if (parsed?.error) {
+        if (parsed.languages.length === 0) {
+          setError(
+            "CV is saved. Pick at least one language. Stack and topics from the CV are filled in.",
+          );
+        }
+      } else if (parsed.error) {
         setError(parsed.error);
       } else {
         setError(
@@ -172,6 +184,10 @@ export function ProfileForm() {
         <p className="mt-1 text-sm text-slate-400">
           PDF only. We try to prefill languages, stack, and topics — you can
           still edit every chip.
+        </p>
+        <p className="mt-2 text-sm text-slate-400">
+          The PDF is read in the app. A text excerpt is sent to the model to
+          suggest chips.
         </p>
         <label className="mt-4 inline-flex cursor-pointer rounded-sm border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400">
           <input

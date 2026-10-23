@@ -192,8 +192,8 @@ export const generateContribution = action({
       return contributionId;
     }
 
-    // Cached README/CONTRIBUTING is enough. Issues decide whether the saved
-    // plan is still open; an empty list means GitHub did not answer, so keep it.
+    // Do not scrape on this click. The docs cron fills repoDocuments;
+    // this plan only reads that cache.
     const issues = await fetchBeginnerIssues(repo.owner, repo.name);
     const allowedUrls = issues.map((issue) => issue.html_url);
     if (

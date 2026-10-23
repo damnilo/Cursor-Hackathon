@@ -1,6 +1,7 @@
 import { internal } from "../../_generated/api";
 import { Doc, Id } from "../../_generated/dataModel";
 import { ActionCtx } from "../../_generated/server";
+import { docsHuntFinished } from "../../lib/docsHunt";
 import { findContributingUrl } from "./exa";
 import {
   contributingFallbackUrls,
@@ -53,13 +54,7 @@ export async function loadRepoDocs(
     { repositoryId },
   );
   // A completed hunt (hit or miss) must not scrape 15 URLs again.
-  if (
-    cached &&
-    (cached.contributingMarkdown ||
-      cached.source === "none" ||
-      cached.note.includes("no CONTRIBUTING") ||
-      cached.note.includes("no docs"))
-  ) {
+  if (docsHuntFinished(cached)) {
     return cached;
   }
 
