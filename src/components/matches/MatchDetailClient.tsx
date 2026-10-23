@@ -88,7 +88,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
       };
     }
     const timeout = window.setTimeout(() => {
-      void ensureSuggested({ sessionId, repositoryId: typedId }).finally(settle);
+      settle();
     }, 22_000);
     return () => {
       cancelled = true;

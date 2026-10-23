@@ -2,7 +2,7 @@
 // AI track inserts/updates title, steps, issueUrl, whyThisIssue via generateContribution.
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { findContributionByKind } from "./lib/contributionLookup";
+import { findContributionByKind, collapseContributions } from "./lib/contributionLookup";
 import { contributionKindValidator } from "./lib/validators";
 import { findProfile } from "./profiles";
 
@@ -86,17 +86,17 @@ export const ensureSuggested = mutation({
     }
 
     const kind = args.kind ?? "first";
-    const existing = await findContributionByKind(
+    const already = await collapseContributions(
       ctx,
       profile._id,
       args.repositoryId,
       kind,
     );
-    if (existing) {
-      return existing._id;
+    if (already) {
+      return already._id;
     }
 
-    return await ctx.db.insert("contributions", {
+    await ctx.db.insert("contributions", {
       profileId: profile._id,
       repositoryId: args.repositoryId,
       title:
@@ -106,6 +106,13 @@ export const ensureSuggested = mutation({
       kind,
       status: "suggested",
     });
+    const keeper = await collapseContributions(
+      ctx,
+      profile._id,
+      args.repositoryId,
+      kind,
+    );
+    return keeper?._id ?? null;
   },
 });
 

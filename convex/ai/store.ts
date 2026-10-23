@@ -19,7 +19,7 @@ export const getRepoDocument = internalQuery({
     return await ctx.db
       .query("repoDocuments")
       .withIndex("by_repository", (q) => q.eq("repositoryId", args.repositoryId))
-      .unique();
+      .first();
   },
 });
 
@@ -36,10 +36,12 @@ export const upsertRepoDocument = internalMutation({
   },
   returns: v.id("repoDocuments"),
   handler: async (ctx, args) => {
-    const existing = await ctx.db
+    const rows = await ctx.db
       .query("repoDocuments")
       .withIndex("by_repository", (q) => q.eq("repositoryId", args.repositoryId))
-      .unique();
+      .take(8);
+    const ordered = [...rows].sort((a, b) => a._creationTime - b._creationTime);
+    const existing = ordered[0];
 
     const doc = {
       repositoryId: args.repositoryId,
@@ -52,6 +54,9 @@ export const upsertRepoDocument = internalMutation({
 
     if (existing) {
       await ctx.db.patch("repoDocuments", existing._id, doc);
+      for (const extra of ordered.slice(1)) {
+        await ctx.db.delete("repoDocuments", extra._id);
+      }
       return existing._id;
     }
     return await ctx.db.insert("repoDocuments", doc);
