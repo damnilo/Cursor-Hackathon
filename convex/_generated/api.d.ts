@@ -10,6 +10,8 @@
 
 import type * as ai_contribute from "../ai/contribute.js";
 import type * as ai_enrich from "../ai/enrich.js";
+import type * as ai_issueCountStore from "../ai/issueCountStore.js";
+import type * as ai_issueCounts from "../ai/issueCounts.js";
 import type * as ai_lib_catalog from "../ai/lib/catalog.js";
 import type * as ai_lib_docs from "../ai/lib/docs.js";
 import type * as ai_lib_exa from "../ai/lib/exa.js";
@@ -45,6 +47,8 @@ import type {
 declare const fullApi: ApiFromModules<{
   "ai/contribute": typeof ai_contribute;
   "ai/enrich": typeof ai_enrich;
+  "ai/issueCountStore": typeof ai_issueCountStore;
+  "ai/issueCounts": typeof ai_issueCounts;
   "ai/lib/catalog": typeof ai_lib_catalog;
   "ai/lib/docs": typeof ai_lib_docs;
   "ai/lib/exa": typeof ai_lib_exa;
