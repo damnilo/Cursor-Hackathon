@@ -73,6 +73,7 @@ export default defineSchema({
     .index("by_repo_and_kind", ["repositoryId", "kind"])
     .index("by_profile", ["profileId"])
     .index("by_profile_and_repo", ["profileId", "repositoryId"])
+    // Convex 1.45 cannot mark an index unique. Writers keep the oldest row.
     .index("by_profile_repo_and_kind", ["profileId", "repositoryId", "kind"]),
 
   // AI track cache for Firecrawl README / CONTRIBUTING. Do not rename other tables.
@@ -83,5 +84,7 @@ export default defineSchema({
     source: v.union(v.literal("firecrawl"), v.literal("none")),
     note: v.string(),
     fetchedAt: v.number(),
-  }).index("by_repository", ["repositoryId"]),
+  })
+    // Convex 1.45 cannot mark an index unique. Writers keep the oldest row.
+    .index("by_repository", ["repositoryId"]),
 });
