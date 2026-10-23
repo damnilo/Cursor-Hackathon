@@ -4,6 +4,7 @@ import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { matchResultValidator, studentProfileFields } from "./lib/validators";
 import { compareByLevelThenScore, passesHardFilters, scoreRepository } from "./lib/scoring";
+import { applySavedRerank } from "./lib/rerank";
 import { findProfile } from "./profiles";
 
 const DEFAULT_LIMIT = 5;
@@ -18,14 +19,14 @@ export const matchRepos = query({
   returns: v.array(matchResultValidator),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    const profile = args.profile
-      ? args.profile
-      : args.sessionId
-        ? await findProfile(ctx, {
+    const stored =
+      args.profile || !args.sessionId
+        ? null
+        : await findProfile(ctx, {
             sessionId: args.sessionId,
             tokenIdentifier: identity?.tokenIdentifier,
-          })
-        : null;
+          });
+    const profile = args.profile ?? stored;
 
     if (!profile || profile.languages.length === 0) {
       return [];
@@ -60,6 +61,6 @@ export const matchRepos = query({
       .sort((a, b) => compareByLevelThenScore(profile.level, a, b));
 
     const limit = Math.min(args.limit ?? DEFAULT_LIMIT, CANDIDATE_LIMIT);
-    return ranked.slice(0, limit);
+    return applySavedRerank(ranked, stored?.rerank, limit);
   },
 });

@@ -222,6 +222,7 @@ async function mergeGuestIntoCanonical(
       ...chipPatch,
       ...cvPatch,
       updatedAt: Date.now(),
+      ...(Object.keys(chipPatch).length > 0 ? { rerank: [] } : {}),
     });
   }
 
@@ -338,6 +339,7 @@ export const upsert = mutation({
       sessionId: args.sessionId,
       ...(tokenIdentifier ? { tokenIdentifier } : {}),
       updatedAt: Date.now(),
+      rerank: [],
     };
 
     if (existing) {

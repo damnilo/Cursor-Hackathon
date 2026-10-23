@@ -40,6 +40,16 @@ export default defineSchema({
     cvFileName: v.optional(v.string()),
     isFixture: v.optional(v.boolean()),
     updatedAt: v.optional(v.number()),
+    // At most 15. Cleared when the profile chips are saved.
+    rerank: v.optional(
+      v.array(
+        v.object({
+          repositoryId: v.id("repositories"),
+          why: v.optional(v.string()),
+        }),
+      ),
+    ),
+    rerankForUpdatedAt: v.optional(v.number()),
   })
     .index("by_slug", ["slug"])
     .index("by_sessionId", ["sessionId"])

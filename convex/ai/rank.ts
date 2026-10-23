@@ -2,7 +2,7 @@
 
 // OWNER: colleague (AI). Rerank with Grok. Must keep runQuery(matching.matchRepos).
 import { action } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import { Infer, v } from "convex/values";
 import { matchResultValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
@@ -93,6 +93,20 @@ export const rankMatches = action({
       }
     }
 
-    return ranked.slice(0, limit);
+    const shown = ranked.slice(0, limit);
+    if (profile) {
+      await ctx.runMutation(internal.ai.store.saveRerank, {
+        profileId: profile._id,
+        rankedForUpdatedAt: profile.updatedAt,
+        rerank: shown.map((repo) => {
+          const reason = repo.reasons.find((item) => item.startsWith("AI: "));
+          const why = reason?.slice(4).trim();
+          return why
+            ? { repositoryId: repo.repositoryId, why }
+            : { repositoryId: repo.repositoryId };
+        }),
+      });
+    }
+    return shown;
   },
 });
