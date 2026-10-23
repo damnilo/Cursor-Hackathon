@@ -3,7 +3,7 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { matchResultValidator, studentProfileFields } from "./lib/validators";
-import { passesHardFilters, scoreRepository } from "./lib/scoring";
+import { compareByLevelThenScore, passesHardFilters, scoreRepository } from "./lib/scoring";
 import { findProfile } from "./profiles";
 
 const DEFAULT_LIMIT = 5;
@@ -27,7 +27,7 @@ export const matchRepos = query({
           })
         : null;
 
-    if (!profile) {
+    if (!profile || profile.languages.length === 0) {
       return [];
     }
 
@@ -57,7 +57,7 @@ export const matchRepos = query({
           reasons,
         };
       })
-      .sort((a, b) => b.score - a.score || b.stars - a.stars);
+      .sort((a, b) => compareByLevelThenScore(profile.level, a, b));
 
     const limit = Math.min(args.limit ?? DEFAULT_LIMIT, CANDIDATE_LIMIT);
     return ranked.slice(0, limit);

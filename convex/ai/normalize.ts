@@ -56,7 +56,7 @@ export const normalizeProfile = action({
         allowedStack: STACK_OPTIONS,
         allowedTopics: TOPIC_OPTIONS,
         instructions:
-          "Map synonyms onto allowed lists. Do not invent chips outside the lists. Keep level as beginner or intermediate. Keep wantGoodFirstIssue boolean.",
+          "You may append stack and topic synonyms from the allowed lists. Do not reorder languages. Do not change level or wantGoodFirstIssue.",
       }),
     );
 
@@ -64,41 +64,19 @@ export const normalizeProfile = action({
       return fallback;
     }
 
-    const languages = pickAllowed(
-      asStringArray(grokResult.languages).length > 0
-        ? asStringArray(grokResult.languages)
-        : fallback.languages,
-      "languages",
-    );
-    const stack = pickAllowed(
-      asStringArray(grokResult.stack).length > 0
-        ? asStringArray(grokResult.stack)
-        : fallback.stack,
-      "stack",
-    );
-    const topics = pickAllowed(
-      asStringArray(grokResult.topics).length > 0
-        ? asStringArray(grokResult.topics)
-        : fallback.topics,
-      "topics",
-    );
-
     const normalized: NormalizedProfile = {
-      languages: languages.length > 0 ? languages : fallback.languages,
-      stack,
-      topics,
-      level:
-        grokResult.level === "intermediate" ? "intermediate" : fallback.level,
-      wantGoodFirstIssue:
-        typeof grokResult.wantGoodFirstIssue === "boolean"
-          ? grokResult.wantGoodFirstIssue
-          : fallback.wantGoodFirstIssue,
+      languages: pickAllowed(fallback.languages, "languages"),
+      stack: pickAllowed(
+        [...fallback.stack, ...asStringArray(grokResult.stack)],
+        "stack",
+      ),
+      topics: pickAllowed(
+        [...fallback.topics, ...asStringArray(grokResult.topics)],
+        "topics",
+      ),
+      level: fallback.level,
+      wantGoodFirstIssue: fallback.wantGoodFirstIssue,
     };
-
-    await ctx.runMutation(api.profiles.upsert, {
-      sessionId: args.sessionId,
-      ...normalized,
-    });
 
     return normalized;
   },

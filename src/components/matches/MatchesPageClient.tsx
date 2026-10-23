@@ -79,7 +79,7 @@ function MatchesList() {
     return <RankingWait />;
   }
 
-  if (!profile) {
+  if (!profile || profile.languages.length === 0) {
     return (
       <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <p className="text-slate-200">No profile on this browser yet.</p>
