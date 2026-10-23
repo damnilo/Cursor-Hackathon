@@ -190,7 +190,7 @@ export const generateContribution = action({
       }),
     ]);
     if (!profile || !repo) {
-      return contributionId;
+      return null;
     }
 
     // Do not scrape on this click. The docs cron fills repoDocuments;
