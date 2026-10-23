@@ -90,3 +90,30 @@ export const applyContributionPlan = internalMutation({
     return null;
   },
 });
+
+const MAX_RERANK = 15;
+
+export const saveRerank = internalMutation({
+  args: {
+    profileId: v.id("studentProfiles"),
+    rankedForUpdatedAt: v.optional(v.number()),
+    rerank: v.array(
+      v.object({
+        repositoryId: v.id("repositories"),
+        why: v.optional(v.string()),
+      }),
+    ),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const profile = await ctx.db.get("studentProfiles", args.profileId);
+    if (!profile || profile.updatedAt !== args.rankedForUpdatedAt) {
+      return null;
+    }
+    await ctx.db.patch("studentProfiles", profile._id, {
+      rerank: args.rerank.slice(0, MAX_RERANK),
+      rerankForUpdatedAt: profile.updatedAt,
+    });
+    return null;
+  },
+});
