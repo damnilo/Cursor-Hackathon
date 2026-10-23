@@ -1,60 +1,11 @@
-// Mirrors src/lib/catalogs.ts so Grok can only emit chips the UI already offers.
-export const LANGUAGE_OPTIONS = [
-  "TypeScript",
-  "JavaScript",
-  "Python",
-  "Go",
-  "Rust",
-  "C",
-  "C++",
-  "C#",
-  "Java",
-  "Kotlin",
-  "Ruby",
-  "PHP",
-  "Markdown",
-  "Shell",
-] as const;
+// Chip lists live in convex/lib/chips.ts. The form re-exports the same arrays.
+import {
+  LANGUAGE_OPTIONS,
+  STACK_OPTIONS,
+  TOPIC_OPTIONS,
+} from "../../lib/chips";
 
-export const STACK_OPTIONS = [
-  "React",
-  "Next.js",
-  "Node.js",
-  "Tailwind",
-  "Vue",
-  "Django",
-  "FastAPI",
-  "Prisma",
-  "Vite",
-  "Docker",
-  "Kubernetes",
-  "Terraform",
-  "PyTorch",
-  "Pandas",
-  "Arduino",
-  "PlatformIO",
-] as const;
-
-export const TOPIC_OPTIONS = [
-  "frontend",
-  "backend",
-  "embedded",
-  "firmware",
-  "devops",
-  "mlops",
-  "machine-learning",
-  "data-science",
-  "cloud",
-  "systems",
-  "documentation",
-  "beginner",
-  "education",
-  "cli",
-  "web",
-  "open-source",
-  "git",
-  "testing",
-] as const;
+export { LANGUAGE_OPTIONS, STACK_OPTIONS, TOPIC_OPTIONS };
 
 const languageMap = new Map(
   LANGUAGE_OPTIONS.map((value) => [value.toLowerCase(), value]),
@@ -78,6 +29,7 @@ const synonyms: Record<string, string> = {
   nextjs: "Next.js",
   "next.js": "Next.js",
   reactjs: "React",
+  react: "frontend",
   py: "Python",
   golang: "Go",
   cpp: "C++",
