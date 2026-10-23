@@ -21,12 +21,7 @@ type SearchResponse = {
 
 const BODY_LIMIT = 1500;
 const MAX_ISSUES = 5;
-const BEGINNER_LABELS = [
-  "good first issue",
-  "good-first-issue",
-  "help wanted",
-  "help-wanted",
-];
+const GOOD_FIRST_LABELS = ["good first issue", "good-first-issue"];
 
 function readGithubToken(): string | undefined {
   const raw = process.env.GITHUB_TOKEN?.trim().replace(/^["']|["']$/g, "");
@@ -142,7 +137,7 @@ async function searchIssues(owner: string, name: string): Promise<GithubIssue[]>
     `repo:${owner}/${name}`,
     "is:issue",
     "is:open",
-    '(label:"good first issue" OR label:"good-first-issue" OR label:"help wanted" OR label:"help-wanted")',
+    '(label:"good first issue" OR label:"good-first-issue")',
   ].join(" ");
   const url = `https://api.github.com/search/issues?per_page=${MAX_ISSUES}&q=${encodeURIComponent(query)}`;
   const response = await githubGet(url);
@@ -192,13 +187,13 @@ export async function fetchBeginnerIssues(
       : "token=missing",
   );
 
-  const primary = await listLabeledIssues(owner, name, BEGINNER_LABELS[0]!);
+  const primary = await listLabeledIssues(owner, name, GOOD_FIRST_LABELS[0]!);
   if (primary.length > 0) {
     return primary.slice(0, MAX_ISSUES);
   }
 
   const labeled = await Promise.all(
-    BEGINNER_LABELS.slice(1).map((label) => listLabeledIssues(owner, name, label)),
+    GOOD_FIRST_LABELS.slice(1).map((label) => listLabeledIssues(owner, name, label)),
   );
   const fromLabels = mergeIssues(labeled);
   if (fromLabels.length >= 1) {
@@ -207,6 +202,26 @@ export async function fetchBeginnerIssues(
 
   const fromSearch = await searchIssues(owner, name);
   return mergeIssues([fromLabels, fromSearch]);
+}
+
+/** Open issues labeled good first issue. Null when GitHub does not answer. */
+export async function countOpenGoodFirstIssues(
+  owner: string,
+  name: string,
+): Promise<number | null> {
+  const query = [
+    `repo:${owner}/${name}`,
+    "is:issue",
+    "is:open",
+    '(label:"good first issue" OR label:"good-first-issue")',
+  ].join(" ");
+  const url = `https://api.github.com/search/issues?per_page=1&q=${encodeURIComponent(query)}`;
+  const response = await githubGet(url);
+  if (!response.ok) {
+    return null;
+  }
+  const payload = (await response.json()) as { total_count?: number };
+  return typeof payload.total_count === "number" ? payload.total_count : null;
 }
 
 export function pickAllowedIssueUrl(

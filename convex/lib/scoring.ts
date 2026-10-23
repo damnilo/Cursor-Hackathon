@@ -15,6 +15,8 @@ export type ScorableRepo = {
   difficulty: Difficulty;
   hasGoodFirstIssues: boolean;
   hasContributingGuide: boolean;
+  goodFirstIssueCount?: number;
+  issuesCheckedAt?: number;
   primaryLanguage: string;
   stars: number;
 };
@@ -24,6 +26,7 @@ const WEIGHTS = {
   stack: 25,
   topics: 20,
   difficulty: 5,
+  goodFirstIssue: 10,
 };
 
 function normalize(value: string): string {
@@ -74,6 +77,17 @@ function languageScore(profile: MatchProfile, repo: ScorableRepo, hits: string[]
   return Math.round(WEIGHTS.language * 0.65);
 }
 
+function goodFirstPoints(profile: MatchProfile, repo: ScorableRepo): number {
+  if (!profile.wantGoodFirstIssue) {
+    return 0;
+  }
+  const count = repo.goodFirstIssueCount;
+  if (typeof count !== "number" || count <= 0) {
+    return 0;
+  }
+  return Math.min(WEIGHTS.goodFirstIssue, count);
+}
+
 function starScore(stars: number): number {
   // log10(100)≈2 → 4, log10(10k)≈4 → 8, log10(100k)≈5 → 10
   return Math.min(10, Math.max(0, Math.round(Math.log10(Math.max(stars, 10)) * 2)));
@@ -93,8 +107,14 @@ export function passesHardFilters(
     }
   }
 
-  if (profile.wantGoodFirstIssue && !repo.hasGoodFirstIssues) {
-    return false;
+  if (profile.wantGoodFirstIssue) {
+    if (typeof repo.goodFirstIssueCount === "number") {
+      if (repo.goodFirstIssueCount <= 0) {
+        return false;
+      }
+    } else if (!repo.hasGoodFirstIssues) {
+      return false;
+    }
   }
 
   return true;
@@ -113,10 +133,9 @@ export function scoreRepository(
 
   const difficultyScore =
     profile.level === repo.difficulty ? WEIGHTS.difficulty : 0;
-  // Every catalog repo currently has the same good-first and guide flags,
-  // so those points do not change order. Live issue counts replace them later.
   const levelPenalty =
     profile.level === "beginner" && repo.difficulty === "intermediate" ? 15 : 0;
+  const goodFirstScore = goodFirstPoints(profile, repo);
 
   const score = Math.max(
     0,
@@ -128,6 +147,7 @@ export function scoreRepository(
           overlapScore(topicHits.length, WEIGHTS.topics) +
           difficultyScore -
           levelPenalty +
+          goodFirstScore +
           starScore(repo.stars),
       ),
     ),
@@ -157,6 +177,13 @@ export function scoreRepository(
   if (levelPenalty > 0) {
     reasons.push(
       "Marked intermediate, so it ranks after beginner repos in the same language.",
+    );
+  }
+  if (goodFirstScore > 0 && typeof repo.goodFirstIssueCount === "number") {
+    reasons.push(
+      repo.goodFirstIssueCount === 1
+        ? "Has 1 open good first issue."
+        : `Has ${repo.goodFirstIssueCount} open good first issues.`,
     );
   }
   if (reasons.length === 0) {

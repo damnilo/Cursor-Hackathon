@@ -227,6 +227,9 @@ export async function syncCuratedRepositories(
 
     const { keeper, removed } = await collapseDuplicates(ctx, matches);
     removedDuplicates += removed;
+    if (typeof keeper.goodFirstIssueCount === "number") {
+      fields.hasGoodFirstIssues = keeper.goodFirstIssueCount > 0;
+    }
     if (!sameCuratedRepo(keeper, fields)) {
       await ctx.db.patch("repositories", keeper._id, fields);
       updated += 1;

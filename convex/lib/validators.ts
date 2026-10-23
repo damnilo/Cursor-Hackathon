@@ -29,6 +29,8 @@ export const repositoryFields = {
   stack: v.array(v.string()),
   hasGoodFirstIssues: v.boolean(),
   hasContributingGuide: v.boolean(),
+  goodFirstIssueCount: v.optional(v.number()),
+  issuesCheckedAt: v.optional(v.number()),
   difficulty: difficultyValidator,
   newcomerNote: v.string(),
   stars: v.number(),
