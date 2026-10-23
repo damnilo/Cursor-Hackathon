@@ -2,7 +2,7 @@
 
 // OWNER: colleague (AI). Replace the passthrough with Grok normalization.
 import { action } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import { Infer, v } from "convex/values";
 import {
   studentProfileFields,
@@ -47,6 +47,14 @@ export const normalizeProfile = action({
       level: profile.level,
       wantGoodFirstIssue: profile.wantGoodFirstIssue,
     };
+
+    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "normalize",
+    });
+    if (!quota.allowed) {
+      return fallback;
+    }
 
     const grokResult = await grokJson(
       "You normalize student profiles for an open-source matching app. Return ONLY JSON.",

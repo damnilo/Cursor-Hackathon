@@ -3,6 +3,7 @@
 import { isConvexConfigured } from "@/app/ConvexClientProvider";
 import { MatchCard } from "@/components/matches/MatchCard";
 import { RankingWait } from "@/components/matches/StatusCycle";
+import { actionNotice } from "@/lib/actionNotice";
 import { useSessionId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -42,6 +43,7 @@ function MatchesList() {
     items: NonNullable<typeof matches> | null;
   } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   const matchKey = useMemo(
     () => matches?.map((match) => match.repositoryId).join(",") ?? "",
     [matches],
@@ -64,12 +66,16 @@ function MatchesList() {
       return;
     }
     setRefreshing(true);
+    setNotice(null);
     try {
       await seed({});
       const next = await rankMatches({ sessionId, limit: 5 });
       setRankResult({ key: matchKey, items: next });
-    } catch {
-      setRankResult({ key: matchKey, items: null });
+    } catch (caught) {
+      setNotice(
+        actionNotice(caught) ??
+          "Could not refresh recommendations. Showing the last list.",
+      );
     } finally {
       setRefreshing(false);
     }
@@ -133,6 +139,7 @@ function MatchesList() {
           {refreshing ? "Refreshing…" : "Refresh recommendations"}
         </button>
       </div>
+      {notice ? <p className="text-sm text-amber-200">{notice}</p> : null}
       {shown.map((match, index) => (
         <MatchCard
           key={match.repositoryId}

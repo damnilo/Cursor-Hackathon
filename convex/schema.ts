@@ -87,4 +87,17 @@ export default defineSchema({
   })
     // Convex 1.45 cannot mark an index unique. Writers keep the oldest row.
     .index("by_repository", ["repositoryId"]),
+
+  // Hourly Grok counters. One row per profile and action kind.
+  aiUsage: defineTable({
+    profileId: v.id("studentProfiles"),
+    kind: v.union(
+      v.literal("rerank"),
+      v.literal("plan"),
+      v.literal("parse"),
+      v.literal("normalize"),
+    ),
+    windowStartedAt: v.number(),
+    count: v.number(),
+  }).index("by_profile_and_kind", ["profileId", "kind"]),
 });

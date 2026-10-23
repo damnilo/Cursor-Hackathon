@@ -193,6 +193,23 @@ export function scoreRepository(
   return { score, reasons };
 }
 
+/** Same order as `/matches` before a saved refresh is applied. */
+export function rankWithOfficialScore<T extends ScorableRepo>(
+  repos: T[],
+  profile: MatchProfile,
+): Array<T & { score: number; reasons: string[] }> {
+  if (profile.languages.length === 0) {
+    return [];
+  }
+  return repos
+    .filter((repo) => passesHardFilters(profile, repo))
+    .map((repo) => {
+      const scored = scoreRepository(profile, repo);
+      return { ...repo, score: scored.score, reasons: scored.reasons };
+    })
+    .sort((a, b) => compareByLevelThenScore(profile.level, a, b));
+}
+
 export function compareByLevelThenScore<
   T extends { difficulty: Difficulty; score: number; stars: number },
 >(level: Difficulty, a: T, b: T): number {

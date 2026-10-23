@@ -1,7 +1,7 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { matchResultValidator } from "./lib/validators";
-import { compareByLevelThenScore, passesHardFilters, scoreRepository, type MatchProfile } from "./lib/scoring";
+import { rankWithOfficialScore, type MatchProfile } from "./lib/scoring";
 
 export const TEST_PROFILES: Array<{ name: string; profile: MatchProfile }> = [
   {
@@ -69,37 +69,32 @@ export const runBaselineTests = query({
     const repos = await ctx.db.query("repositories").take(100);
 
     return TEST_PROFILES.map(({ name, profile }) => {
-      const matches = repos
-        .filter((repo) => passesHardFilters(profile, repo))
-        .map((repo) => {
-          const { score, reasons } = scoreRepository(profile, repo);
-          return {
-            repositoryId: repo._id,
-            owner: repo.owner,
-            name: repo.name,
-            fullName: repo.fullName,
-            url: repo.url,
-            description: repo.description,
-            primaryLanguage: repo.primaryLanguage,
-            languages: repo.languages,
-            topics: repo.topics,
-            stack: repo.stack,
-            hasGoodFirstIssues: repo.hasGoodFirstIssues,
-            hasContributingGuide: repo.hasContributingGuide,
-            difficulty: repo.difficulty,
-            newcomerNote: repo.newcomerNote,
-            stars: repo.stars,
-            verified: true as const,
-            score,
-            reasons,
-          };
-        })
-        .sort((a, b) => compareByLevelThenScore(profile.level, a, b));
+      const ranked = rankWithOfficialScore(repos, profile);
+      const matches = ranked.slice(0, 5).map((repo) => ({
+          repositoryId: repo._id,
+          owner: repo.owner,
+          name: repo.name,
+          fullName: repo.fullName,
+          url: repo.url,
+          description: repo.description,
+          primaryLanguage: repo.primaryLanguage,
+          languages: repo.languages,
+          topics: repo.topics,
+          stack: repo.stack,
+          hasGoodFirstIssues: repo.hasGoodFirstIssues,
+          hasContributingGuide: repo.hasContributingGuide,
+          difficulty: repo.difficulty,
+          newcomerNote: repo.newcomerNote,
+          stars: repo.stars,
+          verified: true as const,
+          score: repo.score,
+          reasons: repo.reasons,
+        }));
 
       return {
         name,
-        candidateCount: matches.length,
-        matches: matches.slice(0, 5),
+        candidateCount: ranked.length,
+        matches,
       };
     });
   },

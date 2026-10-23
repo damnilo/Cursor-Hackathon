@@ -23,6 +23,7 @@ import type * as ai_normalize from "../ai/normalize.js";
 import type * as ai_parseCv from "../ai/parseCv.js";
 import type * as ai_rank from "../ai/rank.js";
 import type * as ai_store from "../ai/store.js";
+import type * as ai_usage from "../ai/usage.js";
 import type * as auth from "../auth.js";
 import type * as contributions from "../contributions.js";
 import type * as data_sampleProfiles from "../data/sampleProfiles.js";
@@ -60,6 +61,7 @@ declare const fullApi: ApiFromModules<{
   "ai/parseCv": typeof ai_parseCv;
   "ai/rank": typeof ai_rank;
   "ai/store": typeof ai_store;
+  "ai/usage": typeof ai_usage;
   auth: typeof auth;
   contributions: typeof contributions;
   "data/sampleProfiles": typeof data_sampleProfiles;

@@ -3,7 +3,7 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 import { matchResultValidator, studentProfileFields } from "./lib/validators";
-import { compareByLevelThenScore, passesHardFilters, scoreRepository } from "./lib/scoring";
+import { rankWithOfficialScore } from "./lib/scoring";
 import { applySavedRerank } from "./lib/rerank";
 import { findProfile } from "./profiles";
 
@@ -33,32 +33,26 @@ export const matchRepos = query({
     }
 
     const repos = await ctx.db.query("repositories").take(100);
-    const ranked = repos
-      .filter((repo) => passesHardFilters(profile, repo))
-      .map((repo) => {
-        const { score, reasons } = scoreRepository(profile, repo);
-        return {
-          repositoryId: repo._id,
-          owner: repo.owner,
-          name: repo.name,
-          fullName: repo.fullName,
-          url: repo.url,
-          description: repo.description,
-          primaryLanguage: repo.primaryLanguage,
-          languages: repo.languages,
-          topics: repo.topics,
-          stack: repo.stack,
-          hasGoodFirstIssues: repo.hasGoodFirstIssues,
-          hasContributingGuide: repo.hasContributingGuide,
-          difficulty: repo.difficulty,
-          newcomerNote: repo.newcomerNote,
-          stars: repo.stars,
-          verified: true as const,
-          score,
-          reasons,
-        };
-      })
-      .sort((a, b) => compareByLevelThenScore(profile.level, a, b));
+    const ranked = rankWithOfficialScore(repos, profile).map((repo) => ({
+      repositoryId: repo._id,
+      owner: repo.owner,
+      name: repo.name,
+      fullName: repo.fullName,
+      url: repo.url,
+      description: repo.description,
+      primaryLanguage: repo.primaryLanguage,
+      languages: repo.languages,
+      topics: repo.topics,
+      stack: repo.stack,
+      hasGoodFirstIssues: repo.hasGoodFirstIssues,
+      hasContributingGuide: repo.hasContributingGuide,
+      difficulty: repo.difficulty,
+      newcomerNote: repo.newcomerNote,
+      stars: repo.stars,
+      verified: true as const,
+      score: repo.score,
+      reasons: repo.reasons,
+    }));
 
     const limit = Math.min(args.limit ?? DEFAULT_LIMIT, CANDIDATE_LIMIT);
     return applySavedRerank(ranked, stored?.rerank, limit);
