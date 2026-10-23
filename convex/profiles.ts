@@ -14,6 +14,7 @@ import {
 } from "./lib/profileAccess";
 import { studentProfileFields } from "./lib/validators";
 import type { Doc, Id } from "./_generated/dataModel";
+import { findContributionByKind } from "./lib/contributionLookup";
 
 const profileDoc = v.object({
   _id: v.id("studentProfiles"),
@@ -118,12 +119,12 @@ async function moveContribution(
   row: Doc<"contributions">,
   toId: Id<"studentProfiles">,
 ) {
-  const clash = await ctx.db
-    .query("contributions")
-    .withIndex("by_profile_and_repo", (q) =>
-      q.eq("profileId", toId).eq("repositoryId", row.repositoryId),
-    )
-    .first();
+  const clash = await findContributionByKind(
+    ctx,
+    toId,
+    row.repositoryId,
+    row.kind,
+  );
   if (!clash) {
     await ctx.db.patch("contributions", row._id, { profileId: toId });
     return;

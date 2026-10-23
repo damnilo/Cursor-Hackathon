@@ -74,8 +74,9 @@ export const applyContributionPlan = internalMutation({
     if (!existing) {
       throw new Error("Contribution not found");
     }
-    const keepCompleted =
-      existing.status === "completed" && args.kind !== "next";
+    if (existing.kind !== args.kind) {
+      throw new Error("Plan kind does not match this contribution");
+    }
     await ctx.db.patch("contributions", args.contributionId, {
       title: args.title,
       issueUrl: args.issueUrl,
@@ -83,8 +84,6 @@ export const applyContributionPlan = internalMutation({
       steps: args.steps,
       skills: args.skills,
       timeEstimate: args.timeEstimate,
-      kind: args.kind,
-      status: keepCompleted ? "completed" : "suggested",
     });
     return null;
   },

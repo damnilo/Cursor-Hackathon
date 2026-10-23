@@ -55,7 +55,7 @@ function MatchesList() {
   const shown = rankedReady ? (rankResult.items ?? matches) : matches;
   const completedIds = new Set(
     (contributions ?? [])
-      .filter((row) => row.status === "completed")
+      .filter((row) => row.kind !== "next" && row.status === "completed")
       .map((row) => row.repositoryId),
   );
 
