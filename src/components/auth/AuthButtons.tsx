@@ -69,7 +69,8 @@ function AuthControls() {
         onClick={() => {
           setWorking(true);
           setError(null);
-          void signIn("google", { redirectTo: window.location.href })
+          const redirectTo = `${window.location.pathname}${window.location.search}`;
+          void signIn("google", { redirectTo })
             .catch((caught: unknown) => {
               const message =
                 caught instanceof Error ? caught.message : "Sign-in failed";
