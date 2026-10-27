@@ -105,11 +105,11 @@ export const parseCv = action({
       return failed("No readable text in that PDF. Pick chips manually.");
     }
 
-    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+    const gate = await ctx.runQuery(internal.ai.usage.status, {
       profileId: profile._id,
       kind: "parse",
     });
-    if (!quota.allowed) {
+    if (!gate.allowed) {
       return failed(PARSE_LIMIT_MESSAGE);
     }
 
@@ -127,6 +127,14 @@ export const parseCv = action({
 
     if (!isRecord(grokResult)) {
       return failed("Could not map the CV to chips. Pick chips manually.");
+    }
+
+    const spent = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "parse",
+    });
+    if (!spent.allowed) {
+      return failed(PARSE_LIMIT_MESSAGE);
     }
 
     const languages = pickAllowed(asStringArray(grokResult.languages), "languages");

@@ -48,11 +48,11 @@ export const normalizeProfile = action({
       wantGoodFirstIssue: profile.wantGoodFirstIssue,
     };
 
-    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+    const gate = await ctx.runQuery(internal.ai.usage.status, {
       profileId: profile._id,
       kind: "normalize",
     });
-    if (!quota.allowed) {
+    if (!gate.allowed) {
       return fallback;
     }
 
@@ -69,6 +69,14 @@ export const normalizeProfile = action({
     );
 
     if (!isRecord(grokResult)) {
+      return fallback;
+    }
+
+    const spent = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "normalize",
+    });
+    if (!spent.allowed) {
       return fallback;
     }
 

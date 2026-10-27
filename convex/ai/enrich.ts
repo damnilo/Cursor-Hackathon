@@ -3,10 +3,10 @@
 // OWNER: colleague (AI). Firecrawl README / CONTRIBUTING. Cached in repoDocuments.
 import { internal } from "../_generated/api";
 import { v } from "convex/values";
-import { action, internalAction } from "../_generated/server";
+import { internalAction } from "../_generated/server";
 import { loadRepoDocs } from "./lib/docs";
 
-export const enrichRepo = action({
+export const enrichRepo = internalAction({
   args: { repositoryId: v.id("repositories") },
   returns: v.object({
     repositoryId: v.id("repositories"),
@@ -32,7 +32,7 @@ export const enrichRepo = action({
 
 const DOCS_BATCH = 1;
 
-/** Fills README / CONTRIBUTING off the click path. One repo per run. */
+/** One repo per run so a slow scrape cannot hit the action limit. */
 export const refreshRepoDocs = internalAction({
   args: {},
   returns: v.object({
