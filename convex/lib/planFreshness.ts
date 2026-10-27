@@ -1,4 +1,8 @@
-/** True when the saved first plan still matches the profile and an open issue. */
+/**
+ * True when a saved plan still matches the chip save and an open issue.
+ * profileUpdatedAt moves on upsert, not when a CV file is stored.
+ * The same rule covers the first plan and the next plan.
+ */
 export function firstPlanIsFresh(args: {
   force?: boolean;
   stepCount: number;

@@ -426,10 +426,10 @@ export const saveCv = mutation({
         updatedAt: Date.now(),
       });
     }
+    // CV text is not a chip change. Plans and the saved rerank follow updatedAt from upsert.
     await ctx.db.patch("studentProfiles", existing._id, {
       cvStorageId: args.storageId,
       cvFileName: args.fileName,
-      updatedAt: Date.now(),
     });
     if (existing.cvStorageId && existing.cvStorageId !== args.storageId) {
       await deleteStorage(ctx, existing.cvStorageId);
