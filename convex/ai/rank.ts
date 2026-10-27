@@ -6,7 +6,7 @@ import { api, internal } from "../_generated/api";
 import { Infer, v, ConvexError } from "convex/values";
 import { matchResultValidator } from "../lib/validators";
 import { grokJson } from "./lib/grok";
-import { RERANK_LIMIT_MESSAGE } from "../lib/aiQuota";
+import { RERANK_LIMIT_MESSAGE, GROK_MISSED_MESSAGE } from "../lib/aiQuota";
 
 type RankedMatch = Infer<typeof matchResultValidator>;
 
@@ -39,11 +39,11 @@ export const rankMatches = action({
     if (!profile) {
       return candidates.slice(0, limit);
     }
-    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+    const gate = await ctx.runQuery(internal.ai.usage.status, {
       profileId: profile._id,
       kind: "rerank",
     });
-    if (!quota.allowed) {
+    if (!gate.allowed) {
       throw new ConvexError(RERANK_LIMIT_MESSAGE);
     }
 
@@ -71,7 +71,15 @@ export const rankMatches = action({
     );
 
     if (!isRecord(grokResult) || !Array.isArray(grokResult.order)) {
-      return candidates.slice(0, limit);
+      throw new ConvexError(GROK_MISSED_MESSAGE);
+    }
+
+    const spent = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "rerank",
+    });
+    if (!spent.allowed) {
+      throw new ConvexError(RERANK_LIMIT_MESSAGE);
     }
 
     const byName = new Map(candidates.map((repo) => [repo.fullName, repo]));

@@ -7,6 +7,10 @@ export const PLAN_LIMIT_MESSAGE =
   "Hourly plan limit reached. Showing the saved plan.";
 export const PARSE_LIMIT_MESSAGE =
   "Hourly CV parse limit reached. Pick chips manually.";
+export const GROK_MISSED_MESSAGE =
+  "The model did not answer. Showing the last list.";
+export const PLAN_MISSED_MESSAGE =
+  "The model did not answer. Open the repository on GitHub, or try again.";
 
 export type QuotaState = {
   count: number;

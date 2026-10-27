@@ -13,7 +13,7 @@ import {
 } from "./lib/githubIssues";
 import { Id } from "../_generated/dataModel";
 import { firstPlanIsFresh } from "../lib/planFreshness";
-import { PLAN_LIMIT_MESSAGE } from "../lib/aiQuota";
+import { PLAN_LIMIT_MESSAGE, PLAN_MISSED_MESSAGE } from "../lib/aiQuota";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -211,11 +211,11 @@ export const generateContribution = action({
       return contributionId;
     }
 
-    const quota = await ctx.runMutation(internal.ai.usage.consume, {
+    const gate = await ctx.runQuery(internal.ai.usage.status, {
       profileId: profile._id,
       kind: "plan",
     });
-    if (!quota.allowed) {
+    if (!gate.allowed) {
       throw new ConvexError(PLAN_LIMIT_MESSAGE);
     }
 
@@ -264,7 +264,30 @@ export const generateContribution = action({
       }),
     );
 
-    const grok = isRecord(grokResult) ? grokResult : {};
+    const grok = isRecord(grokResult) ? grokResult : null;
+    if (!grok) {
+      const saved =
+        kind === "next"
+          ? await ctx.runQuery(api.contributions.getForRepo, {
+              sessionId: args.sessionId,
+              repositoryId: args.repositoryId,
+              kind: "next",
+            })
+          : previous;
+      if ((saved?.steps?.length ?? 0) > 0) {
+        return contributionId;
+      }
+      throw new ConvexError(PLAN_MISSED_MESSAGE);
+    }
+
+    const spent = await ctx.runMutation(internal.ai.usage.consume, {
+      profileId: profile._id,
+      kind: "plan",
+    });
+    if (!spent.allowed) {
+      throw new ConvexError(PLAN_LIMIT_MESSAGE);
+    }
+
     const grokUrl =
       typeof grok.issueUrl === "string" ? grok.issueUrl.trim() : undefined;
     const chosenIssue = pickIssueForKind(
