@@ -1,8 +1,12 @@
 # FirstContrib
 
-Students pick languages and interests (or upload a CV), get 3–5 beginner-friendly GitHub repos from a curated catalog, then an AI-guided first or next contribution plan.
+The first pull request is the hard part. GitHub is full of repositories, and almost none of them tell a newcomer where to start.
 
-Guest mode works without an account. Google sign-in is optional and keeps the same profile, CV, and plans across browsers.
+FirstContrib is a short path through that. You say what you already know — languages, stack, topics, and whether you want a good first issue — or you hand over a CV. The app ranks a curated catalog of beginner-friendly repositories and opens a concrete plan for the one you pick: a real issue, the steps, and a next plan when the first one is done. You can do it as a guest. Sign in with Google when you want the same profile on another browser.
+
+![FirstContrib homepage, with a freeCodeCamp match beside the call to start a profile](docs/homepage.png)
+
+The live app is at [firstcontrib-gbna.onrender.com](https://firstcontrib-gbna.onrender.com).
 
 ## Tech stack
 
