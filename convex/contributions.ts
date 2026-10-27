@@ -6,6 +6,9 @@ import { findContributionByKind, collapseContributions } from "./lib/contributio
 import { contributionKindValidator } from "./lib/validators";
 import { findProfile } from "./profiles";
 
+/** Two plans per repo. The 58-repo catalog stays under this, so a later completed first plan stays on the list. */
+const PROFILE_CONTRIBUTION_CAP = 200;
+
 const contributionDoc = v.object({
   _id: v.id("contributions"),
   _creationTime: v.number(),
@@ -38,7 +41,7 @@ export const listBySession = query({
     return await ctx.db
       .query("contributions")
       .withIndex("by_profile", (q) => q.eq("profileId", profile._id))
-      .take(50);
+      .take(PROFILE_CONTRIBUTION_CAP);
   },
 });
 

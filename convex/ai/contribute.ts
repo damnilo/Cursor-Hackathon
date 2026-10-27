@@ -173,7 +173,7 @@ export const generateContribution = action({
       return null;
     }
 
-    const [profile, repo, previous, docs] = await Promise.all([
+    const [profile, repo, previous, nextPlan, docs] = await Promise.all([
       ctx.runQuery(api.profiles.getBySession, {
         sessionId: args.sessionId,
       }),
@@ -184,6 +184,11 @@ export const generateContribution = action({
         sessionId: args.sessionId,
         repositoryId: args.repositoryId,
         kind: "first",
+      }),
+      ctx.runQuery(api.contributions.getForRepo, {
+        sessionId: args.sessionId,
+        repositoryId: args.repositoryId,
+        kind: "next",
       }),
       ctx.runQuery(internal.ai.store.getRepoDocument, {
         repositoryId: args.repositoryId,
@@ -197,14 +202,14 @@ export const generateContribution = action({
     // this plan only reads that cache.
     const issues = await fetchBeginnerIssues(repo.owner, repo.name);
     const allowedUrls = issues.map((issue) => issue.html_url);
+    const savedPlan = kind === "next" ? nextPlan : previous;
     if (
-      kind === "first" &&
       firstPlanIsFresh({
         force: args.force,
-        stepCount: previous?.steps?.length ?? 0,
+        stepCount: savedPlan?.steps?.length ?? 0,
         profileUpdatedAt: profile.updatedAt,
-        planProfileUpdatedAt: previous?.profileUpdatedAt,
-        savedIssueUrl: previous?.issueUrl,
+        planProfileUpdatedAt: savedPlan?.profileUpdatedAt,
+        savedIssueUrl: savedPlan?.issueUrl,
         openIssueUrls: allowedUrls,
       })
     ) {
