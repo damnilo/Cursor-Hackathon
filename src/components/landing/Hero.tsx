@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BackendStatus } from "./BackendStatus";
 
 const previewChips = ["JavaScript", "beginner", "412k stars"];
 
@@ -51,9 +50,6 @@ export function Hero() {
       <div className="animate-glow-shift pointer-events-none absolute -left-24 top-0 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,_rgba(224,122,61,0.22),_transparent_68%)]" />
       <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center gap-14 lg:flex-row lg:items-center">
         <div className="flex flex-1 flex-col items-start gap-6">
-          <div className="animate-fade-up">
-            <BackendStatus />
-          </div>
           <p className="animate-fade-up font-mono text-[11px] uppercase tracking-[0.22em] text-sky-400 [animation-delay:80ms]">
             For students starting open source
           </p>
