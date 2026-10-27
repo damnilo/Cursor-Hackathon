@@ -84,7 +84,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
         }
       })
       .catch((caught) => {
-        if (cancelled) {
+        if (cancelled || hasSteps) {
           return;
         }
         const notice = actionNotice(caught) ?? "Could not generate a plan yet.";
