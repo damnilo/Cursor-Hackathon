@@ -40,6 +40,8 @@ export default defineSchema({
     cvFileName: v.optional(v.string()),
     isFixture: v.optional(v.boolean()),
     updatedAt: v.optional(v.number()),
+    // Tab that last saved the chips. A new tab sends a different id.
+    visitId: v.optional(v.string()),
     // At most 15. Cleared when the profile chips are saved.
     rerank: v.optional(
       v.array(
