@@ -65,7 +65,7 @@ npx convex login
 npx convex dev
 ```
 
-This writes `NEXT_PUBLIC_CONVEX_URL` into `.env.local`. Do **not** run `npx convex deploy` unless you intend to ship production.
+This writes `NEXT_PUBLIC_CONVEX_URL` into `.env.local` and pushes functions to your dev deployment. The live site calls one production deployment. After a function or schema change, run `npx convex deploy` so that same deployment stays in step with the site. Do not point the command at a new project.
 
 Copy `.env.example` if you need a blank template. Put raw keys in `keys.txt` (gitignored) and copy them into `.env.local`, the Convex dashboard, or Render — never commit them.
 
@@ -105,13 +105,14 @@ On Render, change **`SITE_URL` only** to the public origin. Do not rotate the Go
 
 ## Deploy to Render
 
-Convex stays on Convex Cloud. Render only hosts Next.js.
+Convex stays on Convex Cloud. Render only hosts Next.js. The two move together: deploy Convex to the deployment already set as `NEXT_PUBLIC_CONVEX_URL`, then ship the site.
 
-1. Push to GitHub
-2. New Web Service from [`render.yaml`](render.yaml)
-3. Set `NEXT_PUBLIC_CONVEX_URL` **before the first build**
-4. Build: `npm ci --include=dev && npm run build`
-5. Start: `npm start`
+1. `npx convex deploy` to that existing deployment
+2. Push to GitHub
+3. New Web Service from [`render.yaml`](render.yaml), or let the existing service redeploy
+4. Set `NEXT_PUBLIC_CONVEX_URL` **before the first build**
+5. Build: `npm ci --include=dev && npm run build`
+6. Start: `npm start`
 
 ## Project structure
 
