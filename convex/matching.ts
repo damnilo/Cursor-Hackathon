@@ -6,6 +6,7 @@ import { matchResultValidator, studentProfileFields } from "./lib/validators";
 import { rankWithOfficialScore } from "./lib/scoring";
 import { applySavedRerank } from "./lib/rerank";
 import { findProfile } from "./profiles";
+import { chipsAreStale } from "./lib/chipFreshness";
 
 const DEFAULT_LIMIT = 5;
 const CANDIDATE_LIMIT = 15;
@@ -26,7 +27,9 @@ export const matchRepos = query({
             sessionId: args.sessionId,
             tokenIdentifier: identity?.tokenIdentifier,
           });
-    const profile = args.profile ?? stored;
+    const remembered =
+      stored && !chipsAreStale(stored.updatedAt) ? stored : null;
+    const profile = args.profile ?? remembered;
 
     if (!profile || profile.languages.length === 0) {
       return [];
@@ -55,6 +58,6 @@ export const matchRepos = query({
     }));
 
     const limit = Math.min(args.limit ?? DEFAULT_LIMIT, CANDIDATE_LIMIT);
-    return applySavedRerank(ranked, stored?.rerank, limit);
+    return applySavedRerank(ranked, remembered?.rerank, limit);
   },
 });

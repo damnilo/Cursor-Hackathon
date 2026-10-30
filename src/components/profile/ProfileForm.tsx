@@ -8,11 +8,12 @@ import {
 } from "@/lib/catalogs";
 import { clearSessionId, getSessionId, useSessionId } from "@/lib/session";
 import type { Difficulty, StudentProfile } from "@/lib/matching";
+import { chipsAreStale } from "../../../convex/lib/chipFreshness";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 const emptyProfile: StudentProfile = {
   languages: [],
@@ -48,6 +49,8 @@ async function writableSession(
 export function ProfileForm() {
   const router = useRouter();
   const sessionId = useSessionId();
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+  const droppedStaleSession = useRef<string | null>(null);
   const [draft, setDraft] = useState<StudentProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -82,6 +85,20 @@ export function ProfileForm() {
       // Seed is best-effort; matching page will retry.
     });
   }, [seed]);
+
+  useEffect(() => {
+    if (authLoading || isAuthenticated || !saved) {
+      return;
+    }
+    if (!chipsAreStale(saved.updatedAt)) {
+      return;
+    }
+    if (droppedStaleSession.current === saved._id) {
+      return;
+    }
+    droppedStaleSession.current = saved._id;
+    clearSessionId();
+  }, [authLoading, isAuthenticated, saved]);
 
   async function onCvSelected(file: File | undefined) {
     if (!file || !sessionId) {
