@@ -1,9 +1,13 @@
-export const CHIP_MEMORY_MS = 7 * 24 * 60 * 60 * 1000;
-
-/** True when the saved chip choice is too old to show again. */
-export function chipsAreStale(
-  updatedAt: number | undefined,
-  now = Date.now(),
+/** True when this tab is the one that last saved the chips. */
+export function sameVisit(
+  stored: string | undefined,
+  visitId: string | undefined,
 ): boolean {
-  return typeof updatedAt === "number" && now - updatedAt > CHIP_MEMORY_MS;
+  return (
+    typeof stored === "string" &&
+    stored.length >= 8 &&
+    typeof visitId === "string" &&
+    visitId.length >= 8 &&
+    stored === visitId
+  );
 }

@@ -6,7 +6,7 @@ import { matchResultValidator, studentProfileFields } from "./lib/validators";
 import { rankWithOfficialScore } from "./lib/scoring";
 import { applySavedRerank } from "./lib/rerank";
 import { findProfile } from "./profiles";
-import { chipsAreStale } from "./lib/chipFreshness";
+import { sameVisit } from "./lib/chipFreshness";
 
 const DEFAULT_LIMIT = 5;
 const CANDIDATE_LIMIT = 15;
@@ -14,6 +14,7 @@ const CANDIDATE_LIMIT = 15;
 export const matchRepos = query({
   args: {
     sessionId: v.optional(v.string()),
+    visitId: v.optional(v.string()),
     profile: v.optional(v.object(studentProfileFields)),
     limit: v.optional(v.number()),
   },
@@ -28,7 +29,10 @@ export const matchRepos = query({
             tokenIdentifier: identity?.tokenIdentifier,
           });
     const remembered =
-      stored && !chipsAreStale(stored.updatedAt) ? stored : null;
+      stored &&
+      (args.visitId === undefined || sameVisit(stored.visitId, args.visitId))
+        ? stored
+        : null;
     const profile = args.profile ?? remembered;
 
     if (!profile || profile.languages.length === 0) {

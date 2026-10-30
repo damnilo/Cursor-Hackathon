@@ -4,7 +4,7 @@ import { isConvexConfigured } from "@/app/ConvexClientProvider";
 import { MatchCard } from "@/components/matches/MatchCard";
 import { RankingWait } from "@/components/matches/StatusCycle";
 import { actionNotice } from "@/lib/actionNotice";
-import { useSessionId } from "@/lib/session";
+import { useSessionId, useVisitId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
 import Link from "next/link";
@@ -24,15 +24,16 @@ export function MatchesPageClient() {
 
 function MatchesList() {
   const sessionId = useSessionId();
+  const visitId = useVisitId();
   const seed = useMutation(api.seed.seedRepositories);
   const rankMatches = useAction(api.ai.rank.rankMatches);
   const profile = useQuery(
     api.profiles.getBySession,
-    sessionId ? { sessionId } : "skip",
+    sessionId && visitId ? { sessionId, visitId } : "skip",
   );
   const matches = useQuery(
     api.matching.matchRepos,
-    sessionId ? { sessionId, limit: 5 } : "skip",
+    sessionId && visitId ? { sessionId, visitId, limit: 5 } : "skip",
   );
   const contributions = useQuery(
     api.contributions.listBySession,
@@ -69,7 +70,7 @@ function MatchesList() {
     setNotice(null);
     try {
       await seed({});
-      const next = await rankMatches({ sessionId, limit: 5 });
+      const next = await rankMatches({ sessionId, visitId, limit: 5 });
       setRankResult({ key: matchKey, items: next });
     } catch (caught) {
       setNotice(

@@ -4,7 +4,7 @@ import { isConvexConfigured } from "@/app/ConvexClientProvider";
 import { WhyMatch } from "@/components/matches/MatchCard";
 import { PlanWait } from "@/components/matches/StatusCycle";
 import { actionNotice } from "@/lib/actionNotice";
-import { useSessionId } from "@/lib/session";
+import { useSessionId, useVisitId } from "@/lib/session";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -25,6 +25,7 @@ export function MatchDetailClient({ repositoryId }: { repositoryId: string }) {
 
 function MatchDetail({ repositoryId }: { repositoryId: string }) {
   const sessionId = useSessionId();
+  const visitId = useVisitId();
   const typedId = repositoryId as Id<"repositories">;
   const generateContribution = useAction(api.ai.contribute.generateContribution);
   const markCompleted = useMutation(api.contributions.markCompleted);
@@ -38,7 +39,7 @@ function MatchDetail({ repositoryId }: { repositoryId: string }) {
 
   const matches = useQuery(
     api.matching.matchRepos,
-    sessionId ? { sessionId, limit: 15 } : "skip",
+    sessionId && visitId ? { sessionId, visitId, limit: 15 } : "skip",
   );
   const firstPlan = useQuery(
     api.contributions.getForRepo,

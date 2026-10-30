@@ -17,6 +17,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 export const rankMatches = action({
   args: {
     sessionId: v.string(),
+    visitId: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
   returns: v.array(matchResultValidator),
@@ -25,6 +26,7 @@ export const rankMatches = action({
       api.matching.matchRepos,
       {
         sessionId: args.sessionId,
+        visitId: args.visitId,
         limit: 15,
       },
     );
@@ -35,6 +37,7 @@ export const rankMatches = action({
 
     const profile = await ctx.runQuery(api.profiles.getBySession, {
       sessionId: args.sessionId,
+      visitId: args.visitId,
     });
     if (!profile) {
       return candidates.slice(0, limit);

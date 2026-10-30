@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 
 const SESSION_KEY = "firstcontrib.sessionId";
+const VISIT_KEY = "firstcontrib.visitId";
 
 const listeners = new Set<() => void>();
 
@@ -12,19 +13,34 @@ function emit() {
   }
 }
 
+function subscribe(onStoreChange: () => void) {
+  listeners.add(onStoreChange);
+  return () => listeners.delete(onStoreChange);
+}
+
+function readOrCreate(storage: Storage, key: string): string {
+  const existing = storage.getItem(key);
+  if (existing && existing.length >= 8) {
+    return existing;
+  }
+  const id = crypto.randomUUID();
+  storage.setItem(key, id);
+  return id;
+}
+
 export function getSessionId(): string {
   if (typeof window === "undefined") {
     return "";
   }
+  window.localStorage.removeItem(SESSION_KEY);
+  return readOrCreate(window.sessionStorage, SESSION_KEY);
+}
 
-  const existing = window.localStorage.getItem(SESSION_KEY);
-  if (existing && existing.length >= 8) {
-    return existing;
+export function getVisitId(): string {
+  if (typeof window === "undefined") {
+    return "";
   }
-
-  const sessionId = crypto.randomUUID();
-  window.localStorage.setItem(SESSION_KEY, sessionId);
-  return sessionId;
+  return readOrCreate(window.sessionStorage, VISIT_KEY);
 }
 
 export function clearSessionId(): void {
@@ -32,16 +48,14 @@ export function clearSessionId(): void {
     return;
   }
   window.localStorage.removeItem(SESSION_KEY);
+  window.sessionStorage.removeItem(SESSION_KEY);
   emit();
 }
 
 export function useSessionId(): string {
-  return useSyncExternalStore(
-    (onStoreChange) => {
-      listeners.add(onStoreChange);
-      return () => listeners.delete(onStoreChange);
-    },
-    getSessionId,
-    () => "",
-  );
+  return useSyncExternalStore(subscribe, getSessionId, () => "");
+}
+
+export function useVisitId(): string {
+  return useSyncExternalStore(subscribe, getVisitId, () => "");
 }

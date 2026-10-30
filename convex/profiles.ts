@@ -15,7 +15,7 @@ import {
 import { studentProfileFields } from "./lib/validators";
 import type { Doc, Id } from "./_generated/dataModel";
 import { findContributionByKind } from "./lib/contributionLookup";
-import { chipsAreStale } from "./lib/chipFreshness";
+import { sameVisit } from "./lib/chipFreshness";
 
 const profileDoc = v.object({
   _id: v.id("studentProfiles"),
@@ -28,6 +28,16 @@ const profileDoc = v.object({
   cvFileName: v.optional(v.string()),
   isFixture: v.optional(v.boolean()),
   updatedAt: v.optional(v.number()),
+  visitId: v.optional(v.string()),
+  rerank: v.optional(
+    v.array(
+      v.object({
+        repositoryId: v.id("repositories"),
+        why: v.optional(v.string()),
+      }),
+    ),
+  ),
+  rerankForUpdatedAt: v.optional(v.number()),
   ...studentProfileFields,
 });
 
@@ -83,11 +93,15 @@ export async function findProfile(
   );
 }
 
-/** A week-old choice is not filled back into the form, for a guest or a Google account. */
+/**
+ * A caller that sends a visit id only sees chips saved in that same tab.
+ * Server actions omit the id and still read the stored choice.
+ */
 export function profileForClient(
   profile: Doc<"studentProfiles">,
+  visitId: string | undefined,
 ): Doc<"studentProfiles"> {
-  if (!chipsAreStale(profile.updatedAt)) {
+  if (visitId === undefined || sameVisit(profile.visitId, visitId)) {
     return profile;
   }
   return {
@@ -332,11 +346,12 @@ async function assertSessionWritable(
 export const upsert = mutation({
   args: {
     sessionId: v.string(),
+    visitId: v.string(),
     ...studentProfileFields,
   },
   returns: v.id("studentProfiles"),
   handler: async (ctx, args) => {
-    if (args.sessionId.trim().length < 8) {
+    if (args.sessionId.trim().length < 8 || args.visitId.trim().length < 8) {
       throw new Error("Invalid session");
     }
     if (args.languages.length === 0) {
@@ -355,6 +370,7 @@ export const upsert = mutation({
       level: args.level,
       wantGoodFirstIssue: args.wantGoodFirstIssue,
       sessionId: args.sessionId,
+      visitId: args.visitId,
       ...(tokenIdentifier ? { tokenIdentifier } : {}),
       updatedAt: Date.now(),
       rerank: [],
@@ -370,7 +386,10 @@ export const upsert = mutation({
 });
 
 export const getBySession = query({
-  args: { sessionId: v.string() },
+  args: {
+    sessionId: v.string(),
+    visitId: v.optional(v.string()),
+  },
   returns: v.union(profileDoc, v.null()),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -378,7 +397,7 @@ export const getBySession = query({
       sessionId: args.sessionId,
       tokenIdentifier: identity?.tokenIdentifier,
     });
-    return profile ? profileForClient(profile) : null;
+    return profile ? profileForClient(profile, args.visitId) : null;
   },
 });
 
