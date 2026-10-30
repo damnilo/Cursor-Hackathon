@@ -34,6 +34,7 @@ import type * as health from "../health.js";
 import type * as http from "../http.js";
 import type * as lib_aiQuota from "../lib/aiQuota.js";
 import type * as lib_catalogSync from "../lib/catalogSync.js";
+import type * as lib_chipFreshness from "../lib/chipFreshness.js";
 import type * as lib_chips from "../lib/chips.js";
 import type * as lib_contributionLookup from "../lib/contributionLookup.js";
 import type * as lib_docsHunt from "../lib/docsHunt.js";
@@ -82,6 +83,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/aiQuota": typeof lib_aiQuota;
   "lib/catalogSync": typeof lib_catalogSync;
+  "lib/chipFreshness": typeof lib_chipFreshness;
   "lib/chips": typeof lib_chips;
   "lib/contributionLookup": typeof lib_contributionLookup;
   "lib/docsHunt": typeof lib_docsHunt;

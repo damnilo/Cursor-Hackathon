@@ -15,6 +15,7 @@ import {
 import { studentProfileFields } from "./lib/validators";
 import type { Doc, Id } from "./_generated/dataModel";
 import { findContributionByKind } from "./lib/contributionLookup";
+import { chipsAreStale } from "./lib/chipFreshness";
 
 const profileDoc = v.object({
   _id: v.id("studentProfiles"),
@@ -80,6 +81,23 @@ export async function findProfile(
     bySession.find((row) => visibleSessionRow(row, args.tokenIdentifier)) ??
     null
   );
+}
+
+/** A week-old choice is not filled back into the form, for a guest or a Google account. */
+export function profileForClient(
+  profile: Doc<"studentProfiles">,
+): Doc<"studentProfiles"> {
+  if (!chipsAreStale(profile.updatedAt)) {
+    return profile;
+  }
+  return {
+    ...profile,
+    languages: [],
+    stack: [],
+    topics: [],
+    level: "beginner",
+    wantGoodFirstIssue: true,
+  };
 }
 
 async function rehomeContributions(
@@ -356,10 +374,11 @@ export const getBySession = query({
   returns: v.union(profileDoc, v.null()),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    return await findProfile(ctx, {
+    const profile = await findProfile(ctx, {
       sessionId: args.sessionId,
       tokenIdentifier: identity?.tokenIdentifier,
     });
+    return profile ? profileForClient(profile) : null;
   },
 });
 
