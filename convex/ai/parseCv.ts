@@ -1,33 +1,15 @@
 "use node";
 
-// OWNER: colleague (AI). Prefill catalog chips from a PDF. Does not match or plan.
+// OWNER: colleague (AI). Prefill catalog chips from PDF text. Does not match or plan.
 import { action } from "../_generated/server";
-import { api, internal } from "../_generated/api";
+import { api } from "../_generated/api";
 import { v } from "convex/values";
 import { difficultyValidator } from "../lib/validators";
-import { grokJson } from "./lib/grok";
-import {
-  LANGUAGE_OPTIONS,
-  pickAllowed,
-  STACK_OPTIONS,
-  TOPIC_OPTIONS,
-} from "./lib/catalog";
+import { chipsFromText } from "./lib/catalog";
 import { extractText, getDocumentProxy } from "unpdf";
-import { PARSE_LIMIT_MESSAGE } from "../lib/aiQuota";
 
 const MAX_PDF_BYTES = 8 * 1024 * 1024;
 const MIN_TEXT_CHARS = 40;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function asStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value.filter((item): item is string => typeof item === "string");
-}
 
 type ParseCvResult = {
   languages: string[];
@@ -105,55 +87,21 @@ export const parseCv = action({
       return failed("No readable text in that PDF. Pick chips manually.");
     }
 
-    const gate = await ctx.runQuery(internal.ai.usage.status, {
-      profileId: profile._id,
-      kind: "parse",
-    });
-    if (!gate.allowed) {
-      return failed(PARSE_LIMIT_MESSAGE);
-    }
-
-    const grokResult = await grokJson(
-      "You map a student CV onto a fixed chip catalog for an open-source matching app. Return ONLY JSON.",
-      JSON.stringify({
-        cvText: text.slice(0, 12000),
-        allowedLanguages: LANGUAGE_OPTIONS,
-        allowedStack: STACK_OPTIONS,
-        allowedTopics: TOPIC_OPTIONS,
-        instructions:
-          "Pick languages, stack, and topics ONLY from the allowed lists. Map synonyms (C#, C sharp, PyTorch, FastAPI, MLOps, embedded) onto those lists. Do not invent chips. level is beginner or intermediate. wantGoodFirstIssue is a boolean — true unless the CV clearly shows prior open-source maintainership.",
-      }),
-    );
-
-    if (!isRecord(grokResult)) {
-      return failed("Could not map the CV to chips. Pick chips manually.");
-    }
-
-    const spent = await ctx.runMutation(internal.ai.usage.consume, {
-      profileId: profile._id,
-      kind: "parse",
-    });
-    if (!spent.allowed) {
-      return failed(PARSE_LIMIT_MESSAGE);
-    }
-
-    const languages = pickAllowed(asStringArray(grokResult.languages), "languages");
-    const stack = pickAllowed(asStringArray(grokResult.stack), "stack");
-    const topics = pickAllowed(asStringArray(grokResult.topics), "topics");
-
-    if (languages.length === 0 && stack.length === 0 && topics.length === 0) {
+    const chips = chipsFromText(text);
+    if (
+      chips.languages.length === 0 &&
+      chips.stack.length === 0 &&
+      chips.topics.length === 0
+    ) {
       return failed("No catalog chips found in the CV. Pick chips manually.");
     }
 
     const result: ParseCvResult = {
-      languages,
-      stack,
-      topics,
-      level: grokResult.level === "intermediate" ? "intermediate" : "beginner",
-      wantGoodFirstIssue:
-        typeof grokResult.wantGoodFirstIssue === "boolean"
-          ? grokResult.wantGoodFirstIssue
-          : true,
+      languages: chips.languages,
+      stack: chips.stack,
+      topics: chips.topics,
+      level: "beginner",
+      wantGoodFirstIssue: true,
       error: null,
     };
     return result;
