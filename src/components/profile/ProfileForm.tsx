@@ -140,9 +140,7 @@ export function ProfileForm() {
       } else if (parsed.error) {
         setError(parsed.error);
       } else {
-        setError(
-          "CV is saved. Chip fill from Grok is not ready yet — pick languages manually.",
-        );
+        setError("CV is saved. Pick languages manually.");
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not read the CV");
@@ -188,8 +186,7 @@ export function ProfileForm() {
           still edit every chip.
         </p>
         <p className="mt-2 text-sm text-slate-400">
-          The PDF is read in the app. A text excerpt is sent to the model to
-          suggest chips.
+          The PDF is read in the app. Matching chips are filled from the text.
         </p>
         <label className="mt-4 inline-flex cursor-pointer rounded-sm border border-slate-600 px-4 py-2 text-sm text-slate-200 transition hover:border-slate-400">
           <input
