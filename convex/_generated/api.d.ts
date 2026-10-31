@@ -18,6 +18,7 @@ import type * as ai_lib_exa from "../ai/lib/exa.js";
 import type * as ai_lib_firecrawl from "../ai/lib/firecrawl.js";
 import type * as ai_lib_githubIssues from "../ai/lib/githubIssues.js";
 import type * as ai_lib_grok from "../ai/lib/grok.js";
+import type * as ai_lib_guide from "../ai/lib/guide.js";
 import type * as ai_lib_http from "../ai/lib/http.js";
 import type * as ai_normalize from "../ai/normalize.js";
 import type * as ai_parseCv from "../ai/parseCv.js";
@@ -67,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   "ai/lib/firecrawl": typeof ai_lib_firecrawl;
   "ai/lib/githubIssues": typeof ai_lib_githubIssues;
   "ai/lib/grok": typeof ai_lib_grok;
+  "ai/lib/guide": typeof ai_lib_guide;
   "ai/lib/http": typeof ai_lib_http;
   "ai/normalize": typeof ai_normalize;
   "ai/parseCv": typeof ai_parseCv;
