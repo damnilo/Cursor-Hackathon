@@ -1,44 +1,16 @@
 "use node";
 
-// OWNER: colleague (AI). Replace ensureSuggested with Grok first/next plans.
+// OWNER: colleague (AI). First and next plans from the repo docs and a GitHub issue.
 import { action } from "../_generated/server";
 import { api, internal } from "../_generated/api";
-import { Infer, v, ConvexError } from "convex/values";
+import { Infer, v } from "convex/values";
 import { contributionKindValidator } from "../lib/validators";
-import { grokJson } from "./lib/grok";
-import {
-  fetchBeginnerIssues,
-  pickIssueForKind,
-  type GithubIssue,
-} from "./lib/githubIssues";
+import { fetchBeginnerIssues, pickIssueForKind, type GithubIssue } from "./lib/githubIssues";
+import { guideStepsFromDocs } from "./lib/guide";
 import { Id } from "../_generated/dataModel";
 import { firstPlanIsFresh } from "../lib/planFreshness";
-import { PLAN_LIMIT_MESSAGE, PLAN_MISSED_MESSAGE } from "../lib/aiQuota";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function asStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value.filter((item): item is string => typeof item === "string");
-}
 
 type Kind = Infer<typeof contributionKindValidator>;
-
-function isVagueStep(step: string): boolean {
-  const text = step.trim();
-  return (
-    /find a good first issue/i.test(text) ||
-    /^(fork|clone|git clone)\b/i.test(text) ||
-    /only say to clone/i.test(text) ||
-    /read( the)? (repo )?(guide|readme|contributing)(\.|$)/i.test(text) ||
-    /open .+ README\.md and CONTRIBUTING/i.test(text) ||
-    /pick a docs or comment typo/i.test(text)
-  );
-}
 
 function concreteFallbackSteps(
   kind: Kind,
@@ -81,37 +53,6 @@ function concreteFallbackSteps(
   ];
 }
 
-function enforceSteps(
-  kind: Kind,
-  raw: string[],
-  repoFullName: string,
-  issue: GithubIssue | undefined,
-  previousTitle: string | undefined,
-): string[] {
-  const cleaned = raw
-    .map((step) => step.trim())
-    .filter((step) => step.length > 0 && !isVagueStep(step));
-  const fallback = concreteFallbackSteps(
-    kind,
-    repoFullName,
-    issue,
-    previousTitle,
-  );
-  const merged = [...cleaned];
-  for (const step of fallback) {
-    if (merged.length >= 6) {
-      break;
-    }
-    if (!merged.includes(step)) {
-      merged.push(step);
-    }
-  }
-  if (merged.length < 6) {
-    merged.push(...fallback.slice(merged.length, 6));
-  }
-  return merged.slice(0, 8);
-}
-
 function enforceSkills(raw: string[], profileSkills: string[]): string[] {
   const cleaned = raw.map((skill) => skill.trim()).filter(Boolean);
   if (cleaned.length > 0) {
@@ -121,31 +62,25 @@ function enforceSkills(raw: string[], profileSkills: string[]): string[] {
   return fromProfile.length > 0 ? fromProfile.slice(0, 8) : ["git", "GitHub"];
 }
 
-function grokSystemPrompt(kind: Kind, hasOtherIssue: boolean): string {
-  if (kind === "next") {
-    return [
-      "You write the NEXT open-source contribution plan. It must NOT copy the first plan.",
-      "Return ONLY JSON with keys: title, issueUrl, whyThisIssue, steps, skills, timeEstimate.",
-      hasOtherIssue
-        ? "issueUrl MUST be a different URL from previousIssueUrl, copied exactly from allowedIssueUrls."
-        : "If only one allowed URL exists, reuse it but the work must be a follow-up (tests, PR body, a second file) — not the same patch.",
-      "title MUST start with Next: and must differ from previousTitle.",
-      "whyThisIssue explains what the first plan did not cover.",
-      "steps MUST be 6 to 8 items: tests, lint command, PR body, or another file. Name issue numbers and paths.",
-      "Do not write a first-contribution intro. Do not spend steps only cloning or only reading README.",
-      "skills MUST be a non-empty array. timeEstimate MUST be a string such as \"2-4 hours\".",
-    ].join(" ");
+function planSteps(
+  kind: Kind,
+  repoFullName: string,
+  repoUrl: string,
+  issue: GithubIssue | undefined,
+  previousTitle: string | undefined,
+  readme: string | null | undefined,
+  contributing: string | null | undefined,
+): string[] {
+  const fromDocs = guideStepsFromDocs(readme, contributing);
+  if (fromDocs.length === 0) {
+    return concreteFallbackSteps(kind, repoFullName, issue, previousTitle);
   }
-  return [
-    "You write a concrete FIRST open-source contribution plan for one student and one repo.",
-    "Return ONLY JSON with keys: title, issueUrl, whyThisIssue, steps, skills, timeEstimate.",
-    "issueUrl MUST be copied exactly from allowedIssueUrls, or \"\" if that array is empty. Never invent a URL.",
-    "whyThisIssue MUST name the concrete gap (missing docs, wrong example, bug in a file) and why it fits this student.",
-    "steps MUST be 6 to 8 items. Quote the issue title or a phrase from the issue body. Name the file, docs page, or UI where the gap appears.",
-    "Include a step with the suggested PR title and what the PR body should say (problem, change, issue link).",
-    "Do not write steps that only say to clone the repo or only say to read README/CONTRIBUTING.",
-    "skills MUST be a non-empty array. timeEstimate MUST be a string such as \"2-4 hours\".",
-  ].join(" ");
+  const lead = issue
+    ? `Issue #${issue.number} (${issue.title}): ${
+        issue.body.length > 0 ? issue.body.slice(0, 180) : issue.title
+      }`
+    : `Repository ${repoFullName}: follow the newcomer docs at ${repoUrl}.`;
+  return [lead, ...fromDocs].slice(0, 8);
 }
 
 export const generateContribution = action({
@@ -216,149 +151,40 @@ export const generateContribution = action({
       return contributionId;
     }
 
-    const gate = await ctx.runQuery(internal.ai.usage.status, {
-      profileId: profile._id,
-      kind: "plan",
-    });
-    if (!gate.allowed) {
-      throw new ConvexError(PLAN_LIMIT_MESSAGE);
-    }
-
     const previousUrl = previous?.issueUrl;
-    const hasOtherIssue = issues.some(
-      (issue) => issue.html_url !== previousUrl,
-    );
-
-    const grokResult = await grokJson(
-      grokSystemPrompt(kind, hasOtherIssue),
-      JSON.stringify({
-        kind,
-        previousPlan:
-          kind === "next"
-            ? {
-                title: previous?.title ?? null,
-                issueUrl: previousUrl ?? null,
-                steps: previous?.steps ?? [],
-                whyThisIssue: previous?.whyThisIssue ?? null,
-              }
-            : null,
-        previousIssueUrl: previousUrl ?? null,
-        allowedIssueUrls: allowedUrls,
-        issues: issues.map((issue) => ({
-          title: issue.title,
-          html_url: issue.html_url,
-          labels: issue.labels,
-          body: issue.body,
-          number: issue.number,
-        })),
-        student: {
-          languages: profile.languages,
-          stack: profile.stack,
-          topics: profile.topics,
-          level: profile.level,
-        },
-        repo: {
-          fullName: repo.fullName,
-          url: repo.url,
-          description: repo.description,
-          newcomerNote: repo.newcomerNote,
-          hasGoodFirstIssues: repo.hasGoodFirstIssues,
-        },
-        readme: docs?.readmeMarkdown?.slice(0, 6000) ?? null,
-        contributing: docs?.contributingMarkdown?.slice(0, 4000) ?? null,
-      }),
-    );
-
-    const grok = isRecord(grokResult) ? grokResult : null;
-    if (!grok) {
-      const saved =
-        kind === "next"
-          ? await ctx.runQuery(api.contributions.getForRepo, {
-              sessionId: args.sessionId,
-              repositoryId: args.repositoryId,
-              kind: "next",
-            })
-          : previous;
-      if ((saved?.steps?.length ?? 0) > 0) {
-        return contributionId;
-      }
-      throw new ConvexError(PLAN_MISSED_MESSAGE);
-    }
-
-    const spent = await ctx.runMutation(internal.ai.usage.consume, {
-      profileId: profile._id,
-      kind: "plan",
-    });
-    if (!spent.allowed) {
-      throw new ConvexError(PLAN_LIMIT_MESSAGE);
-    }
-
-    const grokUrl =
-      typeof grok.issueUrl === "string" ? grok.issueUrl.trim() : undefined;
-    const chosenIssue = pickIssueForKind(
-      kind,
-      issues,
-      grokUrl,
-      previousUrl,
-    );
-    const chosenUrl = chosenIssue?.html_url;
-
-    const titleFromGrok =
-      typeof grok.title === "string" && grok.title.trim().length > 0
-        ? grok.title.trim()
-        : undefined;
+    const chosenIssue = pickIssueForKind(kind, issues, undefined, previousUrl);
     const title =
       kind === "next"
-        ? titleFromGrok &&
-          !/first contribution/i.test(titleFromGrok) &&
-          titleFromGrok !== previous?.title
-          ? titleFromGrok.startsWith("Next:")
-            ? titleFromGrok
-            : `Next: ${titleFromGrok}`
-          : chosenIssue
-            ? `Next: follow-up on #${chosenIssue.number} (${chosenIssue.title})`
-            : `Next: tests and PR write-up for ${repo.fullName}`
-        : titleFromGrok
-          ? titleFromGrok
-          : chosenIssue
-            ? `Work on #${chosenIssue.number}: ${chosenIssue.title}`
-            : `Docs fix in ${repo.fullName}`;
-
-    const whyThisIssue =
-      typeof grok.whyThisIssue === "string" &&
-      grok.whyThisIssue.trim().length > 0
-        ? grok.whyThisIssue.trim()
+        ? chosenIssue
+          ? `Next: follow-up on #${chosenIssue.number} (${chosenIssue.title})`
+          : `Next: tests and PR write-up for ${repo.fullName}`
         : chosenIssue
-          ? kind === "next"
-            ? `Follow-up on #${chosenIssue.number} (${chosenIssue.title}): tests, PR body, or a second file — not the first patch.`
-            : `Issue #${chosenIssue.number} (${chosenIssue.title}) is a scoped gap${
-                chosenIssue.body ? `: ${chosenIssue.body.slice(0, 180)}` : ""
-              }.`
-          : undefined;
+          ? `Work on #${chosenIssue.number}: ${chosenIssue.title}`
+          : `Docs fix in ${repo.fullName}`;
+    const whyThisIssue = chosenIssue
+      ? kind === "next"
+        ? `Follow-up on #${chosenIssue.number} (${chosenIssue.title}): tests, PR body, or a second file — not the first patch.`
+        : `Issue #${chosenIssue.number} (${chosenIssue.title}) is a scoped gap${
+            chosenIssue.body ? `: ${chosenIssue.body.slice(0, 180)}` : ""
+          }.`
+      : `Newcomer steps come from the README or CONTRIBUTING for ${repo.fullName}. Start at ${repo.url}.`;
 
     await ctx.runMutation(internal.ai.store.applyContributionPlan, {
       contributionId,
       title,
-      issueUrl: chosenUrl,
+      issueUrl: chosenIssue?.html_url,
       whyThisIssue,
-      steps: enforceSteps(
+      steps: planSteps(
         kind,
-        asStringArray(grok.steps),
         repo.fullName,
+        repo.url,
         chosenIssue,
         previous?.title,
+        docs?.readmeMarkdown,
+        docs?.contributingMarkdown,
       ),
-      skills: enforceSkills(asStringArray(grok.skills), [
-        ...profile.languages,
-        ...profile.stack,
-      ]),
-      timeEstimate:
-        typeof grok.timeEstimate === "string" &&
-        grok.timeEstimate.trim().length > 0
-          ? grok.timeEstimate.trim()
-          : kind === "next"
-            ? "2-3 hours"
-            : "2-4 hours",
+      skills: enforceSkills([], [...profile.languages, ...profile.stack]),
+      timeEstimate: kind === "next" ? "2-3 hours" : "2-4 hours",
       kind,
       profileUpdatedAt: profile.updatedAt ?? Date.now(),
     });

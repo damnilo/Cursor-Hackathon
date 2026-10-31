@@ -1,18 +1,12 @@
 "use node";
 
-// OWNER: colleague (AI). Rerank with Grok. Must keep runQuery(matching.matchRepos).
+// Match order stays the deterministic shortlist. Grok is not called.
 import { action } from "../_generated/server";
-import { api, internal } from "../_generated/api";
-import { Infer, v, ConvexError } from "convex/values";
+import { api } from "../_generated/api";
+import { Infer, v } from "convex/values";
 import { matchResultValidator } from "../lib/validators";
-import { grokJson } from "./lib/grok";
-import { RERANK_LIMIT_MESSAGE, GROK_MISSED_MESSAGE } from "../lib/aiQuota";
 
 type RankedMatch = Infer<typeof matchResultValidator>;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
 
 export const rankMatches = action({
   args: {
@@ -31,104 +25,6 @@ export const rankMatches = action({
       },
     );
     const limit = Math.min(args.limit ?? 5, 5);
-    if (candidates.length === 0) {
-      return [];
-    }
-
-    const profile = await ctx.runQuery(api.profiles.getBySession, {
-      sessionId: args.sessionId,
-      visitId: args.visitId,
-    });
-    if (!profile) {
-      return candidates.slice(0, limit);
-    }
-    const gate = await ctx.runQuery(internal.ai.usage.status, {
-      profileId: profile._id,
-      kind: "rerank",
-    });
-    if (!gate.allowed) {
-      throw new ConvexError(RERANK_LIMIT_MESSAGE);
-    }
-
-    const grokResult = await grokJson(
-      "You rerank beginner-friendly GitHub repos for one student. Return ONLY JSON: {\"order\":[\"owner/name\"],\"why\":{\"owner/name\":\"one sentence\"}}. order must be a subset of the given fullNames, best first.",
-      JSON.stringify({
-        profile: profile
-          ? {
-              languages: profile.languages,
-              stack: profile.stack,
-              topics: profile.topics,
-              level: profile.level,
-              wantGoodFirstIssue: profile.wantGoodFirstIssue,
-            }
-          : null,
-        candidates: candidates.map((repo) => ({
-          fullName: repo.fullName,
-          score: repo.score,
-          reasons: repo.reasons,
-          difficulty: repo.difficulty,
-          description: repo.description,
-          hasGoodFirstIssues: repo.hasGoodFirstIssues,
-        })),
-      }),
-    );
-
-    if (!isRecord(grokResult) || !Array.isArray(grokResult.order)) {
-      throw new ConvexError(GROK_MISSED_MESSAGE);
-    }
-
-    const spent = await ctx.runMutation(internal.ai.usage.consume, {
-      profileId: profile._id,
-      kind: "rerank",
-    });
-    if (!spent.allowed) {
-      throw new ConvexError(RERANK_LIMIT_MESSAGE);
-    }
-
-    const byName = new Map(candidates.map((repo) => [repo.fullName, repo]));
-    const why = isRecord(grokResult.why) ? grokResult.why : {};
-    const ranked: RankedMatch[] = [];
-    const seen = new Set<string>();
-
-    for (const item of grokResult.order) {
-      if (typeof item !== "string" || seen.has(item)) {
-        continue;
-      }
-      const repo = byName.get(item);
-      if (!repo) {
-        continue;
-      }
-      seen.add(item);
-      const reason = why[item];
-      ranked.push({
-        ...repo,
-        reasons:
-          typeof reason === "string" && reason.trim().length > 0
-            ? [`AI: ${reason.trim()}`, ...repo.reasons]
-            : repo.reasons,
-      });
-    }
-
-    for (const repo of candidates) {
-      if (!seen.has(repo.fullName)) {
-        ranked.push(repo);
-      }
-    }
-
-    const shown = ranked.slice(0, limit);
-    if (profile) {
-      await ctx.runMutation(internal.ai.store.saveRerank, {
-        profileId: profile._id,
-        rankedForUpdatedAt: profile.updatedAt,
-        rerank: shown.map((repo) => {
-          const reason = repo.reasons.find((item) => item.startsWith("AI: "));
-          const why = reason?.slice(4).trim();
-          return why
-            ? { repositoryId: repo.repositoryId, why }
-            : { repositoryId: repo.repositoryId };
-        }),
-      });
-    }
-    return shown;
+    return candidates.slice(0, limit);
   },
 });
